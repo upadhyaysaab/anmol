@@ -1,0 +1,19 @@
+chef-client -zr "recipe[cookbook1::recipe1]"
+chef exec ruby -c cookbook1/recipes/recipe1.rb
+
+##APACHE##
+
+package 'httpd' do
+action :install
+end
+
+file '/var/www/html/index.html' do
+content 'Welcome to Technical Guftgu'
+action :create
+end
+
+
+service 'httpd' do
+action [:enable, :start]
+end
+##APACHE##
