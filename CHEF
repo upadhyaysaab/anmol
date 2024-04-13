@@ -8,7 +8,7 @@ action :install
 end
 
 file '/var/www/html/index.html' do
-content 'Welcome to Technical Guftgu'
+content 'Hello my node'
 action :create
 end
 
