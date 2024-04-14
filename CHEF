@@ -29,3 +29,11 @@ file '/basicinfo' do
  group 'root'
 action :create
 end
+
+## MULTIPLE SOFTWARES  ##
+%w(httpd mariadb-server unzip git vim)
+.each do |p|
+action :install
+end
+end
+
