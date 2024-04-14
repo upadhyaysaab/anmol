@@ -43,5 +43,5 @@ end
 ## Role to Node ##
 knife node run_list set node1 "role[devops]"
 
-
+knife node run_list add NODE_NAME 'COOKBOOK::RECIPE_NAME'
 
