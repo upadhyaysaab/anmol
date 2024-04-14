@@ -31,15 +31,17 @@ action :create
 end
 
 ## MULTIPLE SOFTWARES  ##
-%w(httpd mariadb-server unzip git vim)
+%w(httpd mariadb-server unzip git vim) .each do |p|
+package p do
+action :install
+end
+end
 
 ## BOOTSTRAPING ##
  knife bootstrap 10.0.0.180 --ssh-user ec2-user --sudo -i node.pem -N node1
 
 ## Role to Node ##
 knife node run_list set node1 "role[devops]"
-.each do |p|
-action :install
-end
-end
+
+
 
