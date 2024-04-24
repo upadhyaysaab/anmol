@@ -1,0 +1,3 @@
+sed 's/apple/mango' filename (temporary)
+sed 's/apple/mango' file1 > file2 (permanent)
+sed '3d' file.txt (delete 3rd line from file)
