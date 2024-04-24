@@ -1,3 +1,5 @@
 sed 's/apple/mango' filename (temporary)
 sed 's/apple/mango' file1 > file2 (permanent)
 sed '3d' file.txt (delete 3rd line from file)
+sed 's/apple/\A&/g' file.txt     (jitne bhi apple hai unke aage A aajyega)
+\/ (escape sequence delete krne ke liye)
