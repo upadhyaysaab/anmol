@@ -5,3 +5,4 @@ sed 's/apple/\A&/g' file.txt     (jitne bhi apple hai unke aage A aajyega)
 \/ (escape sequence delete krne ke liye)
 cut -d|-f 2,5|tee xyz.txt (copy 2nd and 5th col from file and paste into new file)
 chown -c master file1.txt (changed owenrship root to master)
+chmod
