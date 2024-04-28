@@ -5,6 +5,7 @@
                 $ yum install openswan -y
 
 yum install network-scripts
+
     iii. In /etc/ipsec.conf uncomment following line if not already 
           uncommented:
                  include /etc/ipsec.d/*.conf
@@ -13,7 +14,7 @@ yum install network-scripts
  net.ipv4.conf.all.accept_redirects = 0
  net.ipv4.conf.all.send_redirects = 0
     v. Restart network service:
-                 $ service network restart
+                 $ service network restart / systemctl restart NetworkManager
 
 2. Command for /etc/ipsec.d/aws-vpn.conf
 conn Tunnel1
