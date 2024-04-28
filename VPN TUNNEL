@@ -3,6 +3,8 @@
                 $ sudo su
     ii. Install openswan:
                 $ yum install openswan -y
+
+yum install network-scripts
     iii. In /etc/ipsec.conf uncomment following line if not already 
           uncommented:
                  include /etc/ipsec.d/*.conf
