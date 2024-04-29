@@ -1,0 +1,4 @@
+#Volumes
+
+  docker run -it --name conatiner1 -v /volume1 ubuntu /bin/bash   (new conatiner with new volume)
+  dokcer run -it --name conatiner2 --privileged=true --volumes-from container2 ubuntu /bin/bash  (copy cotainer 1 volume into conatiner 2)
