@@ -28,8 +28,8 @@ conn aws-vpn
         type=tunnel
         ikelifetime=8h
         keylife=1h
-        phase2alg=aes128-sha1;modp1024
-        ike=aes128-sha1;modp1024
+        phase2alg=aes128-sha1;modp1024/2048
+        ike=aes128-sha1;modp1024/2048
         keyingtries=%forever
         keyexchange=ike
         leftsubnet=Customer end VPN CIDR
