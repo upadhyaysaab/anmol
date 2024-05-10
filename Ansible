@@ -3,3 +3,15 @@
 ansible demo -b -m copy -a "src=file1 dest= /temp"   (copy)
 ansible demo -b -m yum -a "pkg=httpd state=present"  (install)
 ansible demo -b -m service -a "name=httpd state=started" (start)
+
+## PLAYBOOK ##
+
+--- # This is installation of Apache
+
+-hosts: demo
+user: ansible
+become: yes
+connection: ssh
+
+-name: Installtion apache
+action:yum name:httpd state:present/installed
