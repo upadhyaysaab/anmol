@@ -6,12 +6,13 @@ ansible demo -b -m service -a "name=httpd state=started" (start)
 
 ## PLAYBOOK ##
 
---- # This is installation of Apache
+--- # This is my first yml
+  -hosts: demo
+   user: ansible
+   become: yes
+   connection: ssh
+   tasks:
 
--hosts: demo
-user: ansible
-become: yes
-connection: ssh
 
--name: Installtion apache
-action:yum name:httpd state:present/installed
+  -name: Installation of apache
+   action: yum name:httpd state:installed
