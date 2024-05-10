@@ -1,0 +1,3 @@
+ansible demo -b -m copy -a "src=file1 dest= /temp"   (copy)
+ansible demo -b -m yum -a "pkg=httpd state=present"  (install)
+ansible demo -b -m service -a "name=httpd state=started" (start)
