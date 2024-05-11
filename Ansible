@@ -17,3 +17,7 @@ ansible demo -b -m service -a "name=httpd state=started" (start)
   tasks:
           - name: This si installtion of apache
             action: yum name='{{pkgname}}' state=present
+
+          - name: start of apache
+            action: systemd name='{{pkgname}}' state=started
+
