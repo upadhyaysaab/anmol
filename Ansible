@@ -6,13 +6,14 @@ ansible demo -b -m service -a "name=httpd state=started" (start)
 
 ## PLAYBOOK ##
 
---- # This is my first yml
-  -hosts: demo
-   user: ansible
-   become: yes
-   connection: ssh
-   tasks:
+--- # This si varibale table
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+  vars:
+           pkgname: httpd
 
-
-  -name: Installation of apache
-   action: yum name:httpd state:installed
+  tasks:
+          - name: This si installtion of apache
+            action: yum name='{{pkgname}}' state=present
