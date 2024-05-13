@@ -55,3 +55,15 @@ ansible demo -b -m service -a "name=httpd state=started" (start)
   handlers:
     - name: restart docker
       action: service name=docker state=started
+
+
+ (Conditions)
+
+---
+- hosts: all
+
+  tasks:
+    - name: installtion of lib
+      command: sudo yum install libreswan -y
+      when: ansible_os_family == "RedHat"
+
