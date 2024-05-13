@@ -36,6 +36,22 @@ ansible demo -b -m service -a "name=httpd state=started" (start)
        action: yum name=docker state=present
        notify: restart docker
 
+
+(Loops)
+
+---
+- hosts: all
+  tasks:
+    - name: creates users files
+      file:
+        path: /tmp/ansible-{{ item }}
+        state: touch
+      loop:
+        - sammy
+        - erika
+        - brian
+
+
   handlers:
     - name: restart docker
       action: service name=docker state=started
