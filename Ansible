@@ -67,3 +67,11 @@ ansible demo -b -m service -a "name=httpd state=started" (start)
       command: sudo yum install libreswan -y
       when: ansible_os_family == "RedHat"
 
+
+(Vaults)
+
+ansible-vault encrypt loop.yml (exsiting encrypt)
+ansible-vault edit loop.yml (editing encrypt file)
+ansible-vault create loop.yml (create encrypt file)
+ansible-vault decrypt loop.yml (vice vers)
+ansible-vault rekey loop.yml (chg pass)
