@@ -5,6 +5,7 @@ ansible demo -b -m yum -a "pkg=httpd state=present"  (install)
 ansible demo -b -m service -a "name=httpd state=started" (start)
 
 ## PLAYBOOK ##
+(Variable)
 
 --- # This si varibale table
 - hosts: demo
@@ -21,3 +22,20 @@ ansible demo -b -m service -a "name=httpd state=started" (start)
           - name: start of apache
             action: systemd name='{{pkgname}}' state=started
 
+
+(Handlers)
+
+--- # This is handlers
+- hosts: demo
+  user: ansible
+  become: yes
+  connection: ssh
+
+  tasks:
+     - name: This is for docker
+       action: yum name=docker state=present
+       notify: restart docker
+
+  handlers:
+    - name: restart docker
+      action: service name=docker state=started
