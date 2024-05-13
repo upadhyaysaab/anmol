@@ -75,3 +75,28 @@ ansible-vault edit loop.yml (editing encrypt file)
 ansible-vault create loop.yml (create encrypt file)
 ansible-vault decrypt loop.yml (vice vers)
 ansible-vault rekey loop.yml (chg pass)
+
+
+(Roles)
+
+[ansible@ip-172-31-21-33 playbook]$ tree
+.
+├── master.yml
+└── roles
+    └── webserver
+        └── tasks
+            └── main.yml
+>>main.yml
+
+-name: installtion of libra
+ command: sudo yum install libreswan -y
+
+>>master.yml
+
+--- #this is for role
+- hosts: all
+  roles:
+     - webserver
+
+[ansible@ip-172-31-21-33 playbook]$ ansible-playbook master.yml
+
