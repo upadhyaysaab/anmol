@@ -1,0 +1,37 @@
+create database human;
+
+
+create table human.person (
+id int (20),
+name varchar (20),
+college varchar (30)
+)
+
+select * from human.person;
+
+insert into human.person(id,name,college)values('1','Anmol','CU');
+insert into human.person(id,name,college)values('2','ANuj','CGC');
+insert into human.person(id,name,college)values('3','Abhishek','DU');
+insert into human.person(id,name,college)values('4','Himan','QA');
+
+Update human.person set name='Anuj' where id='2' and name='ANuj';
+
+create table human.account (
+id int (20),
+business varchar (20),
+location varchar (30)
+)
+
+select * from human.account;
+
+insert into human.account(id,business,location)values('1','Real','India');
+insert into human.account(id,business,location)values('2','Own','USA');
+insert into human.account(id,business,location)values('3','company','UK');
+insert into human.account(id,business,location)values('4','shop','Denmark');
+
+## INNER JOIN ##
+
+select * from
+human.person A
+inner join human.account B
+ON A.id=B.id;
