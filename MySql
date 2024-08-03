@@ -14,6 +14,12 @@ insert into human.person(id,name,college)values('2','ANuj','CGC');
 insert into human.person(id,name,college)values('3','Abhishek','DU');
 insert into human.person(id,name,college)values('4','Himan','QA');
 
+ALTER table human.person ADD column amount int(20) ;
+UPDATE human.person set amount='100' where id='1';
+UPDATE human.person set amount='200' where id='2';
+UPDATE human.person set amount='300' where id='3';
+UPDATE human.person set amount='400' where id='4';
+
 Update human.person set name='Anuj' where id='2' and name='ANuj';
 
 create table human.account (
@@ -35,3 +41,9 @@ select * from
 human.person A
 inner join human.account B
 ON A.id=B.id;
+
+## Subquery##
+
+select * from human.person 
+where amount >
+(select AVG(amount) from human.person);
