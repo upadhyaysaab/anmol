@@ -1,5 +1,5 @@
-sed 's/apple/mango' filename (temporary)
-sed 's/apple/mango' file1 > file2 (permanent)
+sed 's/apple/mango' filename (temporary) (jaha par bhi mango hai unhe apple se replace krega)
+sed 's/apple/mango' file1 > file2 (permanent) (nyi file bnakar usme save krdega)
 sed '3d' file.txt (delete 3rd line from file)
 sed 's/apple/\A&/g' file.txt     (jitne bhi apple hai unke aage A aajyega)
 sed 's/\bapple\b/all/g' new.txt (subsrting chnage nhi hogi)
@@ -7,7 +7,7 @@ sed 's/\bapple\b/all/g' new.txt (subsrting chnage nhi hogi)
 cut -d|-f 2,5|tee xyz.txt (copy 2nd and 5th col from file and paste into new file)
 chown -c master file1.txt (changed owenrship root to master)
 chmod
-find /opt/et/WAS/apps/shared/lib/ -type f -name db2jcc4.jar -exec ls -lrt {} \; 
+find /opt/et/WAS/apps/shared/lib/ -type f -name db2jcc4.jar -exec ls -lrt {} \; (To find everything about that file)
 find . -type f -mtime +4 -exec ls -lrt {} \; (to list files older than 4 days in present working directory)
 find . -type f -size +19000000c -exec ls -lrt {} \; (to list files larger than 19mb in size)
 ps aux | sort -nrk 3,3 | head -n 5 (Find top 3 ptocess which consuming more CPU & memory)
