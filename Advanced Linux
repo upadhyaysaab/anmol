@@ -10,3 +10,4 @@ chmod
 find /opt/et/WAS/apps/shared/lib/ -type f -name db2jcc4.jar -exec ls -lrt {} \; 
 find . -type f -mtime +4 -exec ls -lrt {} \; (to list files older than 4 days in present working directory)
 find . -type f -size +19000000c -exec ls -lrt {} \; (to list files larger than 19mb in size)
+ps aux | sort -nrk 3,3 | head -n 5 (Find top 3 ptocess which consuming more CPU & memory)
