@@ -14,3 +14,5 @@ ps aux | sort -nrk 3,3 | head -n 5 (Find top 3 ptocess which consuming more CPU 
 grep -iR "8769" * (string ko sab directory me check krna)
 ps -A /ps -e (running process)
 kill -9 "process id" (for killing process)
+exmaple.sh (write #!/bin/bash at top)
+chmod u+x exmaple.sh (for make file executbale)
