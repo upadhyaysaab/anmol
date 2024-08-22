@@ -12,3 +12,5 @@ find . -type f -mtime +4 -exec ls -lrt {} \; (to list files older than 4 days in
 find . -type f -size +19000000c -exec ls -lrt {} \; (to list files larger than 19mb in size)
 ps aux | sort -nrk 3,3 | head -n 5 (Find top 3 ptocess which consuming more CPU & memory)
 grep -iR "8769" * (string ko sab directory me check krna)
+ps -A /ps -e (running process)
+kill -9 "process id" (for killing process)
