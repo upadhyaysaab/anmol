@@ -47,3 +47,22 @@ GO TO MASTER AND RUN THIS COMMAND
 kubectl get nodes
 
 **********************END************************************
+vi pod1.yml
+
+kind: Pod                              
+apiVersion: v1                     
+metadata:                           
+  name: testpod                  
+spec:                                    
+  containers:                      
+    - name: c00                     
+      image: ubuntu              
+      command: ["/bin/bash", "-c", "while true; do echo Hello-Bhupinder; sleep 5 ; done"]
+  restartPolicy: Never         # Defaults to Always
+
+kubectl apply -f pod1.yml (code ko build )
+kubectl get pods (no. of pods)
+kubectl get pods -o wide (location ke liye)
+kubectl describe pod testpod (full info)
+kubectl logs -f testpod (logs)
+kubectl delete pod testpod (delete)
