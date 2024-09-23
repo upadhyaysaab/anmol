@@ -46,6 +46,9 @@ awk '{print $NF}' file_name
 How to see line no.?
 awk '{print NR}' file_name
 
+how to add lines and string
+awk '{print NR, $0}' file_name
+
 How to see line no. with - ?
 awk '{print NR "- " $2}' file_name
 
