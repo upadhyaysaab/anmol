@@ -67,3 +67,18 @@ kubectl describe pod testpod (full info)
 kubectl logs -f testpod (logs container)
 kubectl logs -f testpod -c c00 (container detail)
 kubectl delete pod testpod (delete)
+
+
+***** Multi Conatiner in one pod code *****
+kind: Pod
+apiVersion: v1
+metadata:
+  name: testpod3
+spec:
+  containers:
+    - name: c00
+      image: ubuntu
+      command: ["/bin/bash", "-c", "while true; do echo Technical-Guftgu; sleep 5 ; done"]
+    - name: c01
+      image: ubuntu
+      command: ["/bin/bash", "-c", "while true; do echo Hello-Bhupinder; sleep 5 ; done"]
