@@ -67,6 +67,8 @@ kubectl describe pod testpod (full info)
 kubectl logs -f testpod (logs container)
 kubectl logs -f testpod -c c00 (container detail)
 kubectl delete pod testpod (delete)
+kubectl exec testpod -it -c c01 --/bin/bash (Container ke ander aakr kaam krna)
+ps , ps -ef (check rk skte hai)
 
 
 ***** Multi Conatiner in one pod code *****
