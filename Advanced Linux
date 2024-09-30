@@ -31,7 +31,8 @@ wget https://wordpress.org/latest.zip(download ke liye)
 ssh -i root@ip of destination server (access ke piye ddori linux ko)
 ssh -i my.pem ec2-user@ipaddresss (ec2 access)
 scp -i /home/a.txt root@ipaddress of desitinaton: (copy from 1 sever to another)
-
+find . -mtime +30 | xargs rm (find with 30 days older)
+find . -mtime +30 | xargs rm -r(remove also)
 ************  AWK & CUT **************
 
 How to see column 2 or 3?
