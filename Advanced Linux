@@ -113,3 +113,5 @@ How to change the delimeter of output?
 cut -d, -f 1- country.txt --output-delimiter="|"
 
 ************************************************************
+
+hostnamectl set-hostname centos01 (change hostname of machine)
