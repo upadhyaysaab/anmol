@@ -115,3 +115,6 @@ cut -d, -f 1- country.txt --output-delimiter="|"
 ************************************************************
 
 hostnamectl set-hostname centos01 (change hostname of machine)
+grep -c "723" my.txt (string kaa count)
+egrep "723|abc|456" my.txt (multiple string ko search krna)
+grep "^657" myfile.txt (vo saari lines jinse ye staring start ho rhi hai)
