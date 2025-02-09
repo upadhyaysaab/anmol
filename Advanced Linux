@@ -118,3 +118,14 @@ hostnamectl set-hostname centos01 (change hostname of machine)
 grep -c "723" my.txt (string kaa count)
 egrep "723|abc|456" my.txt (multiple string ko search krna)
 grep "^657" myfile.txt (vo saari lines jinse ye staring start ho rhi hai)
+
+************ FIND *****************
+find . -size 50M (jo bhi file 50 mb ke aaspaas hogi vo aajeygi)
+find . -size +1M -size -50M (jo bhi 1 se 50 mb ke beech me vo aajayegi)
+find . -type f (jo files hai vo aajyegi)
+find . -type d (jo folder hai vo aajyege)
+find . -mtime 15 (jo file 15 din phele create hui thi vo aajayegi)
+find . -empty (jo bhi empty file/folder hai vo aaajeygi)
+find . -empty exec rm {} \; (empty file/folder ko delete)
+find . -type f -size 30M -mtime 10 exec rm {} \; (jin bhi files kaa size 30 mb hai or ho jo 10 din phele create hui thi unko delete)
+
