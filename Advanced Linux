@@ -128,4 +128,4 @@ find . -mtime 15 (jo file 15 din phele create hui thi vo aajayegi)
 find . -empty (jo bhi empty file/folder hai vo aaajeygi)
 find . -empty exec rm {} \; (empty file/folder ko delete)
 find . -type f -size 30M -mtime 10 exec rm {} \; (jin bhi files kaa size 30 mb hai or ho jo 10 din phele create hui thi unko delete)
-
+find ./ -iname filename
