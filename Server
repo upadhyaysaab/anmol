@@ -1,0 +1,14 @@
+Networking Node:
+In a network, a node is a point where data can be transmitted or received, such as a computer, server, or router. 
+
+Server Node:
+In a cluster or distributed system, a server node is a specific server within that group, capable of running applications and accessing resources. 
+
+Cluster:
+A cluster is a group of interconnected servers (nodes) that work together to provide high availability, load balancing, and fault tolerance. 
+
+Node in Kubernetes:
+In Kubernetes, a node is a worker machine (physical or virtual) where pods (containers) are deployed and run. 
+
+Node in Distributed Systems:
+In a distributed system, nodes are the individual components (clients, servers, peers) that interact with each other to accomplish a task. 
