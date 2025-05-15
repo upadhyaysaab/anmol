@@ -54,3 +54,13 @@ SELECT COUNT(*) AS null_count
 FROM employees e
 JOIN bonuses b ON e.employee_id = b.employee_id
 WHERE NULLIF(e.salary, b.bonus_amount) IS NULL;
+
+
+SELECT COUNT(*) AS null_count
+FROM (
+  SELECT e.salary, b.bonus_amount
+  FROM employees e
+  JOIN bonuses b ON e.employee_id = b.employee_id
+  LIMIT 10
+) AS subquery
+WHERE NULLIF(e.salary, b.bonus_amount) IS NULL;
