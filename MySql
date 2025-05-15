@@ -47,3 +47,10 @@ ON A.id=B.id;
 select * from human.person 
 where amount >
 (select AVG(amount) from human.person);
+
+----------
+
+SELECT COUNT(*) AS null_count
+FROM employees e
+JOIN bonuses b ON e.employee_id = b.employee_id
+WHERE NULLIF(e.salary, b.bonus_amount) IS NULL;
