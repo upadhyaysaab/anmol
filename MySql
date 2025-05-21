@@ -77,3 +77,27 @@ FROM
     PAYROLL
 WHERE
     BONUS_AMOUNT / NULLIF(WORK_HOURS, 0) IS NOT NULL;
+
+
+
+SELECT *
+FROM (
+  SELECT dept, month, sales
+  FROM (
+    SELECT dept, 'JAN' AS month, jan AS sales FROM sales
+    UNION ALL
+    SELECT dept, 'FEB', feb FROM sales
+    UNION ALL
+    SELECT dept, 'MAR', mar FROM sales
+  )
+  MODEL
+    DIMENSION BY (dept, month)
+    MEASURES (sales)
+    RULES (
+      sales[dept, 'TOTAL'] = sales[dept, 'JAN'] + sales[dept, 'FEB'] + sales[dept, 'MAR']
+    )
+)
+PIVOT (
+  MAX(sales) FOR month IN ('JAN' AS JAN, 'FEB' AS FEB, 'MAR' AS MAR, 'TOTAL' AS TOTAL)
+)
+ORDER BY dept;
