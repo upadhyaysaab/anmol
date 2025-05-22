@@ -101,3 +101,22 @@ PIVOT (
   MAX(sales) FOR month IN ('JAN' AS JAN, 'FEB' AS FEB, 'MAR' AS MAR, 'TOTAL' AS TOTAL)
 )
 ORDER BY dept;
+
+
+----Loop-----
+
+
+BEGIN
+  FOR emp_rec IN (
+    SELECT employee_id, first_name, salary
+    FROM employees
+    WHERE department_id = 10
+  ) LOOP
+    DBMS_OUTPUT.PUT_LINE('ID: ' || emp_rec.employee_id ||
+                         ', Name: ' || emp_rec.first_name ||
+                         ', Salary: ' || emp_rec.salary);
+  END LOOP;
+END;
+/
+SET SERVEROUTPUT ON
+
