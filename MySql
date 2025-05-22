@@ -120,3 +120,7 @@ END;
 /
 SET SERVEROUTPUT ON
 
+
+Shows the total pay (BASE_SALARY + BONUS)
+	•	Uses NULLIF to hide the BONUS if it’s zero (returning NULL instead)
+	•	Also identify employees who do not have salary data
