@@ -124,3 +124,15 @@ SET SERVEROUTPUT ON
 Shows the total pay (BASE_SALARY + BONUS)
 	•	Uses NULLIF to hide the BONUS if it’s zero (returning NULL instead)
 	•	Also identify employees who do not have salary data
+
+Goal:
+
+For each employee, show:
+	•	Their most recent pay and bonus (hide zero bonuses).
+	•	Pay date (as DATE).
+	•	Total pay.
+	•	Previous month’s total pay.
+	•	Whether the total pay increased.
+	•	Only include pay dates after April 1, 2024.
+
+
