@@ -1,0 +1,22 @@
+Create an External Stage for S3
+
+First, create a named external stage pointing to your S3 bucket:
+
+CREATE STAGE my_s3_stage
+  URL = 's3://my-bucket-name/path/'
+  STORAGE_INTEGRATION = my_s3_integration
+  FILE_FORMAT = (TYPE = CSV FIELD_OPTIONALLY_ENCLOSED_BY='"');
+
+-------- OR---------
+CREATE STAGE my_s3_stage
+  URL='s3://my-bucket/data/'
+  CREDENTIALS = (AWS_KEY_ID='...' AWS_SECRET_KEY='...')
+  FILE_FORMAT = (TYPE = 'CSV');
+
+Unload (Push) Data to S3 from a Table
+
+COPY INTO @my_s3_stage
+FROM my_table
+FILE_FORMAT = (TYPE = CSV FIELD_OPTIONALLY_ENCLOSED_BY='"');
+
+LIST @my_s3_stage;
