@@ -1,0 +1,113 @@
+
+# Snowflake to S3 Integration Guide (Using STORAGE INTEGRATION)
+
+## Step 1: Create an IAM Role in AWS
+
+1. Go to the **IAM Console** in AWS.
+2. Click **"Roles"** > **"Create role"**.
+3. Choose **Trusted Entity Type: Custom trust policy** and paste this trust policy (replace `<account_identifier>` with your Snowflake account ID):
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::<account_identifier>:root"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
+
+4. Add a permissions policy allowing **write access** to your S3 bucket:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::your-bucket-name",
+        "arn:aws:s3:::your-bucket-name/*"
+      ]
+    }
+  ]
+}
+```
+
+5. Save the **Role ARN**.
+
+---
+
+## Step 2: Create a STORAGE INTEGRATION in Snowflake
+
+```sql
+CREATE STORAGE INTEGRATION my_s3_integration
+  TYPE = EXTERNAL_STAGE
+  STORAGE_PROVIDER = S3
+  ENABLED = TRUE
+  STORAGE_AWS_ROLE_ARN = '<your_role_arn>'
+  STORAGE_ALLOWED_LOCATIONS = ('s3://your-bucket-name/path/');
+```
+
+---
+
+## Step 3: Get the Snowflake Account Identifier
+
+Run:
+
+```sql
+SELECT SYSTEM$SHOW_STORAGE_INTEGRATIONS();
+```
+
+Use the output to update the IAM trust policy:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::<snowflake_account_id>:user/<snowflake_user>"
+      },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+        "StringEquals": {
+          "sts:ExternalId": "<external_id_from_snowflake>"
+        }
+      }
+    }
+  ]
+}
+```
+
+---
+
+## Step 4: Create a Stage Using the Integration
+
+```sql
+CREATE STAGE my_s3_stage
+  URL = 's3://your-bucket-name/path/'
+  STORAGE_INTEGRATION = my_s3_integration
+  FILE_FORMAT = (TYPE = CSV FIELD_OPTIONALLY_ENCLOSED_BY='"');
+```
+
+---
+
+## Step 5: Push (Unload) Data to S3
+
+```sql
+COPY INTO @my_s3_stage
+FROM my_table;
+```
