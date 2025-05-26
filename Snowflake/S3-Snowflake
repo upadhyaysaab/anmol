@@ -1,0 +1,7 @@
+COPY INTO my_table
+FROM @my_s3_stage
+FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='"')
+PATTERN = '.*\\.csv';  -- Optional: restrict to specific files
+
+
+columns must be same
