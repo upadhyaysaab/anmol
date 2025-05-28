@@ -20,3 +20,6 @@ FROM my_table
 FILE_FORMAT = (TYPE = CSV FIELD_OPTIONALLY_ENCLOSED_BY='"');
 
 LIST @my_s3_stage;
+
+https://9rjj6kfe.r.ap-southeast-2.awstrack.me/L0/https:%2F%2Fgbnjxxk-iv86898.snowflakecomputing.com%2Fconsole%2Flogin/1/010801970e495567-2aa47e28-b788-4427-bc12-654e7d0cacb6-000000/pB14ZlqSZYdcE98JlyNIpvApLeU=208
+
