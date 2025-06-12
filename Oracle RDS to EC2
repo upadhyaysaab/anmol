@@ -34,7 +34,7 @@ BEGIN
 END;
 /
 
-SELECT dept, year, budget
+SELECT dept, year, TO_CHAR(ROUND(budget, 2)) AS budget
 FROM budget_forecast
 MODEL
   PARTITION BY (dept)
