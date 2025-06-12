@@ -34,3 +34,15 @@ BEGIN
 END;
 /
 
+SELECT dept, year, budget
+FROM budget_forecast
+MODEL
+  PARTITION BY (dept)
+  DIMENSION BY (year)
+  MEASURES (budget)
+  RULES
+    ITERATE (1000) UNTIL (budget[ITERATION_NUMBER] >= 2000)
+    (
+      budget[CV(year) + 1] = budget[CV()] * 1.05
+    )
+ORDER BY dept, year;
