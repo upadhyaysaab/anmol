@@ -46,3 +46,42 @@ MODEL
       budget[CV(year) + 1] = budget[CV()] * 1.05
     )
 ORDER BY dept, year;
+-----
+
+
+
+
+
+WITH forecasted AS (
+  SELECT dept, year, budget
+  FROM budget_forecast
+  MODEL
+    PARTITION BY (dept)
+    DIMENSION BY (year)
+    MEASURES (budget)
+    RULES
+      ITERATE (1000) UNTIL (budget[ITERATION_NUMBER] >= 2000)
+      (
+        budget[CV(year) + 1] = budget[CV()] * 1.05
+      )
+),
+stats AS (
+  SELECT 
+    dept,
+    MAX(year) AS forecast_until_year,
+    SUM(budget) AS total_budget_per_dept
+  FROM forecasted
+  GROUP BY dept
+)
+SELECT 
+  f.dept,
+  f.year,
+  ROUND(f.budget, 2) AS budget,
+  ROUND(s.total_budget_per_dept, 2) AS total_budget_per_dept,
+  s.forecast_until_year
+FROM forecasted f
+JOIN budget_forecast b
+  ON f.dept = b.dept AND f.year = b.year
+JOIN stats s
+  ON f.dept = s.dept
+ORDER BY f.dept;
