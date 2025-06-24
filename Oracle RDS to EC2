@@ -85,3 +85,15 @@ JOIN budget_forecast b
 JOIN stats s
   ON f.dept = s.dept
 ORDER BY f.dept;
+
+
+
+
+
+- OAC Tools: RPD Modeling, Data Visualizations, Dashboards, BI Publisher- Languages: SQL, PL/SQL, Shell scripting, CURL- Cloud: Oracle Cloud Infrastructure (OCI), Oracle Autonomous DB- Tools: Oracle Data Integrator (ODI), OBIEE, Oracle BI Admin Tool- Databases: Oracle DB, MySQL, PostgreSQL- Version Control & DevOps: Git, Jenkins- Methodologies: Agile, Scrum
+Professional Experience
+Oracle Analytics Cloud ConsultantSLK SOFTWARE – Bengaluru12/2022 – Present- Designed and developed interactive dashboards and reports using Oracle Analytics Cloud.- Built complex RPD models involving logical hierarchies, aggregation rules, and row-level security.- Migrated OBIEE 11g/12c repositories and reports to OAC using BAR files and Oracle CLI.- Developed cloud scripts using CURL to automate deployment and configuration tasks.- Integrated ODI pipelines for ETL processing and improved reporting performance by 30%.- Worked closely with Agile teams to deliver iterative reporting solutions on OCI.- Tuned SQL queries and Oracle DB procedures for improved dashboard response time.- Collaborated with cross-functional teams for Oracle Cloud Infrastructure-based app development.
+Education
+Bachelor of Engineering (B.E.) in Computer Science Engineering – IBM CloudChandigarh University – Gharuan 
+Project Highlights
+OAC Migration for Financial Analytics – [Fifth Third Bank]- Migrated 200+ OBIEE dashboards to OAC.- Implemented row-level security and user access control via RPD modeling.
