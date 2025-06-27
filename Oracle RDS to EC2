@@ -100,3 +100,27 @@ A BAR file typically includes:
 	4.	Configuration files – Custom messages, instance configuration, etc.
 
 BAR stands for BI Archive File. It is a packaged archive used in Oracle Analytics Cloud (OAC) to export/import entire application content for migration, backup, or deployment purposes.
+
+
+What is Essbase?
+
+Essbase (Extended Spreadsheet Database) is a multi-dimensional OLAP (Online Analytical Processing) engine used to analyze large volumes of data rapidly across multiple dimensions.
+
+Originally developed by Hyperion and later acquired by Oracle, Essbase is widely used in:
+	•	Financial planning
+	•	Budgeting & forecasting
+	•	Complex analytics requiring real-time aggregation
+
+⸻
+
+🧱 How Essbase Works:
+
+Imagine data not in rows and columns (like a normal DB), but in a cube:
+	•	One axis = Time
+	•	One = Product
+	•	One = Region
+	•	One = Scenario (Actuals vs Budget)
+
+You can then slice and dice this cube:
+	•	Get Sales of Product A in North Region during Q1 for 2024 Actuals
+	•	Instantly aggregate totals across time or product lines
