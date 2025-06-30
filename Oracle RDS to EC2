@@ -121,6 +121,15 @@ Imagine data not in rows and columns (like a normal DB), but in a cube:
 	•	One = Region
 	•	One = Scenario (Actuals vs Budget)
 
-You can then slice and dice this cube:
+You can then slice and dice ythis cube:
 	•	Get Sales of Product A in North Region during Q1 for 2024 Actuals
 	•	Instantly aggregate totals across time or product lines
+
+
+On a daily basis, I design and develop dashboards using OAC DV, apply custom filters and calculations, and ensure performance through SQL tuning and optimized visualizations. I also work on RPD modeling — defining logical hierarchies, joins, row-level security, and subject areas.
+
+I’ve been involved in OBIEE 11g/12c to OAC migration projects, where I handled BAR file creation, CLI-based deployment, and post-migration validations. I also use CURL scripts with REST APIs to automate snapshot creation, backup tasks, and start/stop operations in OAC.
+
+For backend processing, I’ve worked with ODI pipelines to manage ETL workflows and improved dashboard response time by optimizing queries and materialized views.
+
+I also have hands-on exposure to Essbase — especially using Essbase cubes within OAC for financial or multidimensional reporting. I understand how to use hierarchies, dimensions, and cube structures to support more analytical depth for business users.
