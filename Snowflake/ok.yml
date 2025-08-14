@@ -1,0 +1,615 @@
+kind: Pod                              
+apiVersion: v1                     
+metadata:                           
+  name: testpod                  
+spec:                                    
+  containers:                      
+name: c00                     
+      image: ubuntu              
+      command: 
+  restartPolicy: Never         # Defaults to Always
+
+
+--MULTICONTAINER--
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: anmol
+  annotations:
+    description: "This is the updated one"
+spec:
+  containers:
+  - name: anmol
+    image: busybox
+    command: ["sh", "-c", "echo 'hello this is anmol' && sleep 5"]
+  - name: abhishek
+    image: busybox
+    command: ["sh", "-c", "echo 'hello this is abhishek' && sleep 5"]
+  restartPolicy: Never
+
+
+-- kubectl logs anmolabhi -f abhishek
+-- kubectl exec env -c anmol -it -- sh
+
+--ENVIRONAMENT VARIABLES--
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: env
+spec:
+  containers:
+  - name: anmol
+    image: busybox
+    command: ["sh", "-c", "echo 'This is env' && sleep 360"]
+    env:
+    - name: myname
+      value: Anmol
+
+    for checking:-  echo $myname
+
+    -- PORTS containers:--
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: testpod4
+spec:
+  containers:
+    - name: c00
+      image: httpd
+      ports:
+        - containerPort: 80
+
+--- MULTI PODS--
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod1
+spec:
+  containers:
+    - name: pod1
+      image: httpd
+      ports:
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod2
+spec:
+  containers:
+    - name: pod2
+      image: busybox
+      command: ["sh", "-c", "echo 'Hi this is multipod' && sleep 500"]
+
+   
+------ LABELS-----
+    
+    kubectl label pod anmol class=higher     (label banana ouside manifest yml)
+    kubectl get pods --show-labels           (current labels ki info )
+    kubectl get pods -l env=production       (give the pod which has that label)  
+
+------ Labels & Selectors------
+
+Equality based (=, !=)
+Set based (in, notin, exists)  [Multiple values]
+
+get pods -l 'name in (a1,a2)'
+get pods -l 'name notin (a1,a2)'
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: anmol
+  labels:
+    name: a1
+    env: production
+    company: slk
+spec:
+  containers:
+    - name: myapp
+      image: busybox
+      command: ["sh", "-c", "echo 'Hi this is my label' && sleep 500"]
+
+
+------- NODE SELECTORS-------
+ 
+1 master has 4 nodes (if we want to create on specific node then we use node selector)
+e.g   in labels (hardware=t2.medium  )  [So that node have t2.medium instance vha pod create honge]
+
+    command:  kubectl label nodes (private ip of node) hardware=t2.micro
+              kubectl describe pod anmol
+
+--IF want to add in code--- (It comes under spec)
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: mycontainer
+      image: busybox
+  nodeSelector:
+    disktype: ssd
+
+
+------ Scaling & Replications ------
+
+1. Reliability  (Agar ek pod kaharab hoga , to doosre par shift ho jaayega[]replica)
+2. Scaling (agar load bdh rha hai (suppose 3 pod hai) , to load bdthe time POD auto create ho jaayege node pe)
+3. Load Balancers (Multiple PODS ko balance krna , equally)
+4. Rollimng Update
+
+Suppose 1 Node{500 POD hai or utne hi honge } agar need jyda hai to automnatically (new nodes bengi or unpar baaki 
+podes create honge)
+
+5. ReplicationController =
+      Suppose, We decsribe our desired state =2 (agar ek fail hogye , to ek or create honge)
+      **agar ek delete hogya , fir bhi 2 hi honge ** (bcz we put desired state =2)
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: myreplica                 [Object name]
+spec: 
+  replicas: 2                    [Ye hamara desired state hai, means itne honge hi , if one got deleted]  [POD creation]
+  selector:
+    hardware: t2.medium               [ POD vhi create honge jo node t2. medium par hoga]
+  template:                          {POD kaisa bngea ye batayega}
+    metadata:
+      name: mypod
+      labels:
+        myname: Anmol                 [Lables]
+        env: production
+    spec:
+      containers:
+      - name: c1
+        image: busybox
+        command: ["/bin/bash", "-c", "while true; do echo Hello; sleep 5; done"]
+
+kubectl describe rc myreplica
+
+kubectl scale --replicas=4 rc -l myname=Anmol   (jha par label mynam=anmol hai us pod ko 4 baar  banaodo)
+                                                 (2 phele bnaaye the ab total 4 hogye)
+kubectl scale --replicas=1 rc -l myname=Anmol    (DOWN krna)
+
+***Replica_Set** (equlaity based as well as set based dono par kaam krta hai)
+means (agar scaling krni ho to apn labels par multiple condition daal skte hai 
+
+like :- kubectl scale rs myrs --replicas=1
+
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: myrs
+spec:
+  replicas: 2
+  selector:
+    matchExpressions:
+      - key: myname
+        operator: In
+        values:
+          - Anmol
+          - Abhi
+      - key: env
+        operator: NotIn
+        values:
+          - production
+  template:
+    metadata:
+      name: testpod7
+      labels:
+        myname: Anmol
+        env: staging
+    spec:
+      containers:
+        - name: c2
+          image: ubuntu
+          command: ["/bin/bash", "-c", "while true; do echo Technical-Guftgu; sleep 5; done"]
+
+
+***************Deployment_ROLLBACK********
+
+Deployment provides decraltive set for Pods & Replicasets
+
+             Deployment ---------
+             |                   |
+             replica set1         replicaset2
+             |                        |
+             POd1                     Pod 2
+
+             agar Pod1 me kuch update hoga to deplpoyemnt object ek nya replica bna dega (old wale pod stop/delete
+              ho jaayege)
+             or agar rollback krna ho Pod2 to Pod 1 (ROLLBACK object kr dega)
+    saara code Pod2 kaa pod 1 me aajyega (blhe hi dono me no. of pods alag ho)
+    Scaling bhi kr skte hai 
+
+    jo pod sbe aakhir me create honge vo sbse phele delete honge
+    We can pause the depolyment(after fixing we can resume)
+
+
+
+**kubectl get deploy   (jab ko apna deployment cluster me dekhna/inspect krna ho)
+                      (Name, age, ready, up to date .... ye sab information dega aapko aapke deploy kaa)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mydeployments
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: deployment
+  template:
+    metadata:
+      labels:
+        name: deployment
+    spec:
+      containers:
+        - name: c4
+          image: busybox
+          command: ["/bin/bash", "-c", "while true; do echo Hello; sleep 5; done"]
+
+kubectl describe deploy mydeployments (kitne rs hai pods hai)
+kubectl get rs (kitne replica sets hai)
+
+
+**Rollout_Commands:-
+kubectl rollout status deployment mydeployment
+kubectl rollout history deployment mydeployment {Kitni baar changes kiye hai, vo sab aajyega}
+kubectl rollout undo (previous version par aajeyga replica)
+
+-------NETWORKING-----
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod1
+spec:
+  containers:
+    - name: c00
+      image: busybox
+      command: ["/bin/bash", "-c", "while true; do echo Anmol; sleep 5; done"]
+    - name: c01
+      image: httpd
+      ports:
+        - containerPort: 80
+
+Testing (Con1 to cont2  inside same POD same NODE)
+[root@ip-172-31-89-65 ec2-user]# kubectl exec pod1 -it -c c00 -- /bin/sh
+/ # curl localhost:80
+/ # wget -qO- http://localhost:8
+
+Testing (Pod to Pod inside same node)
+
+[root@ip-172-31-89-65 ec2-user]# kubectl get pods -o wide
+NAME              READY   STATUS    RESTARTS   AGE     IP            NODE                       NOMINATED NODE   READINESS GATES
+myreplica-h99h6   1/1     Running   0          40m     10.244.0.8    my-cluster-control-plane   <none>           <none>
+pod4              1/1     Running   0          6m47s   10.244.0.11   my-cluster-control-plane   <none>           <none>
+pod5              1/1     Running   0          19m     10.244.0.10   my-cluster-control-plane   <none>           <none>
+
+# use ip address of different pods to communicate b/w pods
+# curl ipaddress 
+
+-------SERVICES---------
+
+# tumhara pod ip1 par chl rha tha , par kuch issue hua pod kharab hogya or replica set ki need se 1 or pod bn gya
+# uss case me POD ki Ip change hoti hai we know...
+
+yha par hum SERVICEs object ko replica set ke upar lgaate hai (Virtual IP provide krta hai) (MAP krta hai replica ko POD ko)
+# so agar POD ki Ip change hoti hai to bhi Hmm usko SERVICES ki IP se access kr skte hai, respose same hoga
+# replica ke alawa bhi or bhi object par lgaa skte hai , e.g deployment bla bla (static IP dega SERVICES )
+# Inshort (SERVICES ek bridge hai PODS and end user ke beech , jo virtual ip deta hai)
+# Mapping kaa kaam kube proxy krta hai (virtual ip map to Pod Ip)
+# Cluster Ip (default) , Elastic Ip and Load balancers  (Ye treeke hote hai services ke)
+## 2 nodes in one cluster each node has one pod (If they want to communicate with other then thye use Cluster Ip)
+# Cluster Ip ke upar Node Port lgta hai or fir uske upar Load balancer lgta hai
+# cluster ke bahar IP use nhi hoti
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mydeployments
+spec:
+  replicas: 1  
+  selector:                                      # tells the controller which pods to watch/belong to
+    matchLabels:
+      name: deployment
+  template:
+    metadata:
+      name: testpod1
+      labels:
+        name: deployment
+    spec:
+      containers:
+        - name: c00
+          image: httpd
+          ports:
+            - containerPort: 80
+
+====================
+apiVersion: v1
+kind: Service
+metadata:
+  name: demoservice
+spec:
+  selector:
+    name: deployment  # Targets pods with this label
+  ports:
+    - port: 80         # Port exposed by the service
+      targetPort: 80   # Port on the pod
+  type: ClusterIP      # Default type, internal access only
+                     
+
+[root@ip-172-31-89-65 ec2-user]# kubectl get svc
+NAME                  TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+demoservice           ClusterIP      10.96.112.212   <none>        80/TCP         61s
+
+----NODEPORT-----
+## U can access your pod outside cluster by public dns with port 
+# We dont need ip on this , by port we can access (Port map krna hota hai virtual IP ko(cluster ip ko))
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: demoservice
+spec:
+  selector:
+    name: deployment  # Targets pods with this label
+  ports:
+    - port: 80         # Port exposed by the service
+      targetPort: 80   # Port on the pod
+  type: NodePort
+
+  service/demoservice configured
+[root@ip-172-31-89-65 ec2-user]# kubectl get svc
+NAME                  TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+demoservice           NodePort       10.96.112.212   <none>        80:32424/TCP   45h
+
+We got port above for nortport
+kubectl describe svc demoservice (get the details about Nodeport)
+
+-------VOLUME------
+
+# volukme POD par connected hota hai
+# agar container delete hota hai, to volume par farak nhi pdta
+# new container par same volume aajayega
+# only inside POD volume accessible hota hai
+
+# Ek POD me volume ko multiple containers ek saath attach kr skte hai
+
+----- VOLUME TYPES---
+nfs , elastic block storage, gitrepo
+
+--- Empty DIR---
+
+# agar POD delete/crash hogya to
+# new POD bnane par , empty volume create hogi
+
+# Hum mount krge volume ko different containers par, jo bhi update hoga sbka sab volume par data jaayega
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myvolemptydir
+spec:
+  containers:
+    - name: c1
+      image: busybox
+      command: ["/bin/sh", "-c", "sleep 15000"]
+      volumeMounts:
+        - name: xchange
+          mountPath: "/tmp/xchange"
+    - name: c2
+      image: busybox
+      command: ["/bin/sh", "-c", "sleep 10000"]
+      volumeMounts:
+        - name: xchange
+          mountPath: "/tmp/data"
+  volumes:
+    - name: xchange
+      emptyDir: {}
+
+## We can access same data via two containers
+
+[root@ip-172-31-89-65 ec2-user]# kubectl exec myvolemptydir -c c1 -it -- /bin/sh
+/ # ls
+bin           etc           lib           proc          product_uuid  sys           usr
+dev           home          lib64         product_name  root          tmp           var
+/ # cd tmp
+/tmp # ls
+xchange
+/tmp # cd xchange
+/tmp/xchange # ls -ltr
+total 0
+/tmp/xchange # touch abc.txt
+/tmp/xchange # cd 
+~ # exit -------------------------------------------------------------------------------------------------
+[root@ip-172-31-89-65 ec2-user]# kubectl exec myvolemptydir -c c2 -it -- /bin/sh
+/ # ls
+bin           etc           lib           proc          product_uuid  sys           usr
+dev           home          lib64         product_name  root          tmp           var
+/ # cd tmp
+/tmp # 'ls
+
+/tmp # ls
+data
+/tmp # cd data
+/tmp/data # ls -ltr
+total 0
+-rw-r--r--    1 root     root             0 Jul 23 23:33 abc.txt
+
+
+------- HOSTPATH----
+
+# Ek POD ko doosri POD ke volume ko access krna
+# humko host path me mount krna hota hai
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myvolhostpath
+spec:
+  containers:
+    - name: testc
+      image: busybox
+      command: ["/bin/sh", "-c", "sleep 15000"]
+      volumeMounts:
+        - name: testvolume
+          mountPath: /tmp/hostpath
+  volumes:
+    - name: testvolume
+      hostPath:
+        path: /tmp/data
+        type: DirectoryOrCreate
+
+        -------------------------------------------------------------------------------------------------
+
+----- Persistent Volume ----
+
+# Cluster wide resource
+# Multiple woker nodes PV ko access kr skte hai (type of NAS)
+# POD ke delete hone par kuch farak nhi pdega
+# We create EBS  and we connect to node (Its always available)
+
+## **EBS ko divide krge volumes me or nodes ko dege**
+# Suppose 100 gb hai EBS , and jitni volume chaaiye vo hum pod par define krege (like 5gb or 6gb)
+# PV objects dene hote hai , usme se distribute hote hai
+# Shared volume accross cluster 
+# Claim krna pdta hai , kitni volume chaaiye
+# Hum release bhi kr skte hai
+
+# phele volume define krge , then claim krege usme se kitni chaaiye jo define kri hai
+
+----VOLU DEFINE--
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: myebsvol
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  awsElasticBlockStore:
+    volumeID: vol-042dda85865440f2c # YAHAN APNI EBS VOLUME ID DAALO
+    fsType: ext4
+
+------CLAIM KRNA---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myebsvolclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+[root@ip-172-31-89-65 ec2-user]# kubectl apply -f defvol.yml
+persistentvolume/myebsvol created
+[root@ip-172-31-89-65 ec2-user]# kubectl get pv
+NAME       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+myebsvol   1Gi        RWO            Recycle          Available                          <unset>     
+                     12s
+[root@ip-172-31-89-65 ec2-user]# vi claimvol.yml
+[root@ip-172-31-89-65 ec2-user]# kubectl apply -f claimvol.yml
+persistentvolumeclaim/myebsvolclaim created
+[root@ip-172-31-89-65 ec2-user]# kubectl get pvc
+NAME            STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+myebsvolclaim   Pending         
+
+----Attached Into PODS----
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pvdeploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mypv
+  template:
+    metadata:
+      labels:
+        app: mypv
+    spec:
+      containers:
+        - name: shell
+          image: busybox
+          command: ["bin/sh", "-c", "sleep 10000"]
+          volumeMounts:
+            - name: mypd
+              mountPath: "/tmp/persistent"
+      volumes:
+        - name: mypd
+          persistentVolumeClaim:
+            claimName: myebsvolclaim
+
+-------LivenessProbe----HEALTHCHECK------
+
+# Container ki health check hoti hai(Ek time ke baad)
+# if response 0 aayega means good  hai
+# Otherwise POD ko regenerate kraayega (kubelet krega)
+# Conatiner alive hai ke nhi, uske under application running hai ke nhi
+--Parameters---
+# Initial Delay dete hai (Like 5 sec , means after 5 sec test should be start)
+# period second (eg 20 sec , means fater every 30 sec health check hoga)
+# timeout second (e.g. agar 30 sec tak kuch bhi nhi ayaa to fail ho jaayega)
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mylivenessprobe
+  labels:
+    test: liveness
+spec:
+  containers:
+    - name: liveness
+      image: busybox
+      args:
+        - /bin/sh
+        - -c
+        - touch /tmp/healthy; sleep 1000
+      livenessProbe:
+        exec:
+          command:
+            - cat
+            - /tmp/healthy
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        timeoutSeconds: 30
+
+
+# Path par jakar "echo $" dena hoga (agar 0 yaa means healthy hai, otherwise unhealthy)
+
+-----------------CONFIG & SECERTS-----------------
+
+# Virtual memory create krta hai or vha .conf file save krta hai
+# agar koi POD kaharab hoga , to nye wale ke saath automatic aajeygi (jo path doge aap us par)
+# configurtion maintain krt hai (plain text file hoti hai)
+# e.g (Testing , QA or production  jab file jaati hai, comit hoke)
+# jaise jaise move kregi (vaise vaise map hogi files)
+
+# secerts (contains id, pass), sensitive data
+# ***readable nhi hota
+# encrypted hota hai  (txt or yaml file)
+
+# Humko virtual memory ko map krna hota hai kisi path par
+
+
+# Config or secerts 2 treh se access hota hai (volume in POD and Environment variable)
+
