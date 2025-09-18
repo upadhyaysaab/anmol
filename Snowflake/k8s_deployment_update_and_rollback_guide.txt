@@ -1,0 +1,54 @@
+
+Kubernetes Deployment: Update and Rollback Guide
+
+==============================
+🔧 How to Update a Deployment
+==============================
+
+1. Check the current Deployment:
+   kubectl get deployment <deployment-name>
+   kubectl describe deployment <deployment-name>
+
+2. Update the container image:
+   kubectl set image deployment/<deployment-name> <container-name>=<new-image>:<tag> --record
+   Example:
+   kubectl set image deployment/my-app my-app-container=my-app:v2 --record
+
+3. Monitor the rollout status:
+   kubectl rollout status deployment/<deployment-name>
+
+4. Verify new Pods:
+   kubectl get pods -l app=<your-app-label>
+
+5. Confirm rollout history:
+   kubectl rollout history deployment/<deployment-name>
+
+==============================
+🔁 How to Rollback a Deployment
+==============================
+
+1. View rollout history:
+   kubectl rollout history deployment/<deployment-name>
+
+2. Rollback to the previous revision:
+   kubectl rollout undo deployment/<deployment-name>
+
+3. Rollback to a specific revision:
+   kubectl rollout undo deployment/<deployment-name> --to-revision=<revision-number>
+
+4. Monitor the rollback status:
+   kubectl rollout status deployment/<deployment-name>
+
+5. Verify Pods and logs:
+   kubectl get pods -l app=<your-app-label>
+   kubectl logs <pod-name>
+
+==============================
+✅ Best Practices
+==============================
+
+- Always use --record to track changes.
+- Use readiness probes to ensure healthy updates.
+- Monitor metrics and logs during rollout.
+- Use revisionHistoryLimit in your Deployment spec to retain rollback history.
+
