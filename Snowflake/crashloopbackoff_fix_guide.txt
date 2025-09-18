@@ -1,0 +1,66 @@
+
+📘 Fixing CrashLoopBackOff in Kubernetes Production Environment
+
+🎯 Scenario:
+You’re a DevOps engineer managing a production Kubernetes cluster. One of your microservices, `auth-service`, is in a CrashLoopBackOff state. Your goal is to identify the root cause and fix it without causing further disruption.
+
+🧠 Step-by-Step Theory + Commands
+
+🔹 1. Identify the Problem
+Check which Pods are crashing:
+    kubectl get pods -n production
+
+🔹 2. Inspect Logs
+View logs to understand why the container is crashing:
+    kubectl logs <pod-name> -n production
+
+🔹 3. Describe the Pod
+Get detailed info about the Pod:
+    kubectl describe pod <pod-name> -n production
+
+🔹 4. Common Root Causes and Fixes
+
+✅ Bad Image or Tag
+Cause: Image doesn’t exist or has bugs.
+Fix:
+    kubectl set image deployment/auth-service auth-container=registry.example.com/auth-service:v1.0.1 -n production
+
+✅ Missing ConfigMap or Secret
+Cause: Pod references a non-existent ConfigMap or Secret.
+Fix:
+    kubectl get configmap <name> -n production
+    kubectl get secret <name> -n production
+
+✅ Probe Failures
+Cause: Liveness or readiness probes are too strict.
+Fix: Update the Deployment YAML:
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 20
+      periodSeconds: 10
+Apply the fix:
+    kubectl apply -f auth-deployment.yaml
+
+✅ Crash in App Code
+Cause: Bug in the new version.
+Fix:
+    kubectl rollout undo deployment/auth-service -n production
+
+🔹 5. Restart the Pod (Temporary)
+Force a restart:
+    kubectl delete pod <pod-name> -n production
+
+🔹 6. Monitor After Fix
+Check Pod status:
+    kubectl get pods -n production
+Check logs again:
+    kubectl logs <new-pod-name> -n production
+
+🔹 7. Document the Incident
+Always:
+- Record the root cause
+- Note the fix applied
+- Update runbooks or incident logs
+- Share with the team for future prevention
