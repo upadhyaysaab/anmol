@@ -64,3 +64,7 @@ Always:
 - Note the fix applied
 - Update runbooks or incident logs
 - Share with the team for future prevention
+
+Command	Purpose	Output Type
+kubectl describe pod	Inspect pod configuration & events	Metadata, status, lifecycle events
+kubectl logs pod name	View container logs	Application-level logs (e.g., Apache) (error etc)
