@@ -1,0 +1,61 @@
+Jenkins Interview Questions and Answers for DevOps (3 Years Experience)
+
+1. What is Jenkins and how have you used it in your projects?
+Answer:
+Jenkins is an open-source automation server used for building, testing, and deploying applications. I’ve used Jenkins to set up CI/CD pipelines for microservices deployed on AWS EKS. My pipelines include stages for code checkout, Docker image build, pushing to ECR, and updating Kubernetes deployments using kubectl.
+
+2. What is a Jenkinsfile and why is it important?
+Answer:
+A Jenkinsfile is a text file that defines the CI/CD pipeline as code. It allows version control of the pipeline, improves collaboration, and ensures consistency across environments. I’ve written Jenkinsfiles to automate deployments to EKS, including Docker build, ECR push, and Kubernetes rollout.
+
+3. How do you integrate Jenkins with Docker and Kubernetes?
+Answer:
+I use Jenkins agents with Docker installed to build images. For Kubernetes, I configure Jenkins with kubectl and use withKubeConfig to authenticate with EKS. The pipeline builds the image, pushes it to ECR, and updates the Kubernetes deployment using kubectl set image.
+
+4. How do you manage credentials securely in Jenkins?
+Answer:
+I use Jenkins' Credentials Manager to store secrets like AWS access keys, DockerHub credentials, and kubeconfig files. These are injected into the pipeline using withCredentials or withKubeConfig blocks to avoid hardcoding sensitive data.
+
+5. How do you trigger Jenkins pipelines?
+Answer:
+Pipelines can be triggered manually, on a schedule (using cron), or automatically via webhooks from Git repositories. I often use GitHub webhooks to trigger builds on code push or pull request events.
+
+6. How do you handle failures in Jenkins pipelines?
+Answer:
+I use the post block in Jenkinsfile to handle success and failure notifications. For example:
+post {
+  success {
+    echo 'Deployment succeeded.'
+  }
+  failure {
+    echo 'Deployment failed. Check logs.'
+  }
+}
+I also integrate Slack or email notifications for alerts.
+
+7. What plugins have you used in Jenkins?
+Answer:
+Some key plugins I’ve used:
+- Git Plugin – for source control
+- Docker Pipeline Plugin – for Docker operations
+- Kubernetes CLI Plugin – for interacting with EKS
+- Credentials Binding Plugin – for secure secrets
+- Blue Ocean – for visualizing pipelines
+
+8. How do you ensure rollback in Jenkins deployments?
+Answer:
+I tag Docker images with build numbers and keep previous versions in ECR. If a deployment fails, I manually or automatically redeploy the last known good image using:
+kubectl set image deployment/my-app my-app=<ecr-url>:<previous-tag>
+
+9. How do you scale Jenkins for multiple teams or projects?
+Answer:
+I use Jenkins agents (static or dynamic via Kubernetes) to run jobs in parallel. I also organize jobs using folders, use shared libraries for reusable code, and configure RBAC for access control.
+
+10. What are some best practices you follow with Jenkins pipelines?
+Answer:
+- Use pipeline as code (Jenkinsfile)
+- Store secrets securely
+- Keep stages modular and reusable
+- Use tagging for traceability
+- Integrate automated testing
+- Monitor pipeline performance and failures
