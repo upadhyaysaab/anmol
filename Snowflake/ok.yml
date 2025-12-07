@@ -613,3 +613,15 @@ spec:
 
 # Config or secerts 2 treh se access hota hai (volume in POD and Environment variable)
 
+
+
+
+
+---How to check load in pod---
+
+To identify which pod is under load, we can:
+	1.	Use kubectl top pod to see CPU/memory usage.
+	2.	Check pod logs for errors or latency.
+	3.	Use monitoring tools like Prometheus/Grafana or AWS CloudWatch for metrics and dashboards.
+	4.	In some setups, service mesh metrics (Istio/Linkerd) can show per-pod request load.
+These methods help pinpoint the pod experiencing high load in production.”
