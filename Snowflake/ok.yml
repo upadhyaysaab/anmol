@@ -625,3 +625,9 @@ To identify which pod is under load, we can:
 	3.	Use monitoring tools like Prometheus/Grafana or AWS CloudWatch for metrics and dashboards.
 	4.	In some setups, service mesh metrics (Istio/Linkerd) can show per-pod request load.
 These methods help pinpoint the pod experiencing high load in production.”
+
+
+---- how to rollback in real time--
+
+In production, to rollback a Deployment: first check rollout status, then check revision history. Use kubectl rollout undo to revert to previous or specific revision. Monitor pods and application after rollback to ensure stability. Rollbacks are handled at the Deployment/ReplicaSet level, not individual pods, ensuring zero downtime.”
+
