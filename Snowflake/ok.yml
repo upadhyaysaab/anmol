@@ -44,7 +44,7 @@ spec:
     image: busybox
     command: ["sh", "-c", "echo 'This is env' && sleep 360"]
     env:
-    - name: myname
+    - name: mynameC
       value: Anmol
 
     for checking:-  echo $myname
@@ -184,6 +184,8 @@ means (agar scaling krni ho to apn labels par multiple condition daal skte hai
 
 like :- kubectl scale rs myrs --replicas=1
 
+Selector = “Which Pods should I manage?”
+Template = “What should my Pods look like?”
 
 apiVersion: apps/v1
 kind: ReplicaSet
@@ -234,7 +236,7 @@ Deployment provides decraltive set for Pods & Replicasets
     jo pod sbe aakhir me create honge vo sbse phele delete honge
     We can pause the depolyment(after fixing we can resume)
 
-
+kubectl set image deployment/mydeployments c4=busybox:latest (image ko update krne ke liye)
 
 **kubectl get deploy   (jab ko apna deployment cluster me dekhna/inspect krna ho)
                       (Name, age, ready, up to date .... ye sab information dega aapko aapke deploy kaa)
@@ -266,6 +268,8 @@ kubectl get rs (kitne replica sets hai)
 kubectl rollout status deployment mydeployment
 kubectl rollout history deployment mydeployment {Kitni baar changes kiye hai, vo sab aajyega}
 kubectl rollout undo (previous version par aajeyga replica)
+kubectl rollout undo deployment/<name> --to-revision=<n> (specifix version)
+
 
 -------NETWORKING-----
 
@@ -365,8 +369,8 @@ spec:
   selector:
     name: deployment  # Targets pods with this label
   ports:
-    - port: 80         # Port exposed by the service
-      targetPort: 80   # Port on the pod
+    - port: 80         # Port exposed by the service (client uses this)
+      targetPort: 80   # Port on the pod (container port (app listens here))
   type: NodePort
 
   service/demoservice configured
@@ -377,6 +381,58 @@ demoservice           NodePort       10.96.112.212   <none>        80:32424/TCP 
 We got port above for nortport
 kubectl describe svc demoservice (get the details about Nodeport)
 
+------------------------------------------------------------------------
+✅ 1. ClusterIP
+
+What it does:
+Exposes the service only inside the cluster.
+Pods can communicate with each other using this internal IP, but it’s not accessible from outside the cluster.
+Use case:
+Internal communication between microservices (e.g., backend talking to database).
+Default type:
+If you don’t specify a type, Kubernetes creates a ClusterIP service.
+
+
+✅ 2. NodePort
+
+What it does:
+Exposes the service on a static port (30000–32767) on every node’s IP address.
+External traffic can reach the service using:
+<NodeIP>:<NodePort>
+
+
+How it works:
+
+NodePort forwards traffic to the ClusterIP service.
+You still need to know the node’s IP to access it externally.
+
+
+Use case:
+Simple external access without a cloud load balancer.
+
+
+✅ 3. LoadBalancer
+
+What it does:
+Creates an external load balancer (usually via your cloud provider) and assigns a public IP.
+Traffic from outside the cluster is routed to the NodePort service, then to the pods.
+How it works:
+
+Requires a cloud environment (AWS, Azure, GCP, etc.).
+Automatically provisions a load balancer resource.
+
+
+Use case:
+Production-grade external access with load balancing.
+
+
+🔗 Relationship
+
+ClusterIP is the base.
+NodePort builds on ClusterIP for external access.
+LoadBalancer builds on NodePort for cloud-based load balancing.
+
+------------------------------------------------------------------------
 -------VOLUME------
 
 # volukme POD par connected hota hai
@@ -570,6 +626,23 @@ spec:
 # period second (eg 20 sec , means fater every 30 sec health check hoga)
 # timeout second (e.g. agar 30 sec tak kuch bhi nhi ayaa to fail ho jaayega)
 
+Liveness Probe
+
+Purpose: Checks if the container is still alive (running).
+If the liveness probe fails:
+
+Kubernetes kills the container and restarts it (based on restart policy).
+Use Case: Detect deadlocks or stuck processes.
+------------------------------
+
+Readiness Probe
+
+Purpose: Checks if the container is ready to serve traffic.
+If the readiness probe fails:
+
+Kubernetes removes the pod from Service endpoints (no traffic sent).
+Use Case: Wait until app finishes initialization or dependencies are ready.
+------------------------------
 apiVersion: v1
 kind: Pod
 metadata:
@@ -613,21 +686,106 @@ spec:
 
 # Config or secerts 2 treh se access hota hai (volume in POD and Environment variable)
 
+---CRASH LOOP BACK FIX--
+
+To fix a CrashLoopBackOff issue in Kubernetes, i'll start by 
+checking the pod logs using kubectl logs <pod-name> --previous to 
+identify the root cause of the crash. If the problem is due to 
+application errors, correct the code or configuration and redeploy. 
+For missing environment variables or secrets, I'll ensure that they are properly 
+defined in ConfigMaps or Secrets and referenced in the pod specifications. 
+If resource limits are too strict and causing OOMKilled, I'll increase CPU 
+or memory requests and limits in the deployment YAML. Also, I'll verify 
+that liveness and readiness probes are correctly configured, 
+because incorrect probes can cause unnecessary restarts. After making changes, 
+apply the updated manifest using kubectl apply -f <file> and monitor the 
+pod with kubectl get pods --watch to confirm it moves to a Running state. 
+
+For OOM error:- kubectl top pod <pod-name> -n <namespace>
+
+----- Load in PODS----
+
+In Kubernetes, you can check the load on pods by monitoring their 
+resource usage, primarily CPU and memory. The most common way is using 
+the kubectl top pod command, which requires the Metrics Server to be 
+installed in the cluster. This gives real-time resource consumption 
+for each pod. Additionally, you can use kubectl describe pod <pod-name> 
+to view resource requests and limits, though this shows configuration 
+rather than live usage. For more detailed monitoring, tools like 
+Prometheus with Grafana or CLI dashboards like K9s provide historical 
+and real-time metrics. Kubernetes itself doesn’t measure load directly, 
+so external monitoring solutions are often used for deeper insights.
+
+
+------------------------------
+Sonarcube---
+
+SonarQube Jenkins में इस तरह काम करता है कि यह आपके कोड को 
+bugs, vulnerabilities, और code smells के लिए analyze करता है। 
+Jenkins pipeline में build और test के बाद, Jenkins SonarScanner 
+(Maven, Gradle या CLI के जरिए) चलाता है, जो analysis results को 
+SonarQube server पर भेजता है। Server इन results को Quality Gate 
+के against evaluate करता है, जो तय करता है कि कोड standards पर 
+खरा उतरता है या नहीं। अगर Quality Gate fail हो जाता है, तो Jenkins 
+waitForQualityGate() step का इस्तेमाल करके pipeline को fail कर सकता 
+है। इससे यह सुनिश्चित होता है कि केवल 
+clean और secure code ही आपके CI/CD pipeline में आगे बढ़े।
+
+
+
+Quality Gate का मतलब बहुत आसान है: यह SonarQube में एक चेकपॉइंट 
+है जो तय करता है कि आपका कोड अच्छा है या नहीं। इसमें कुछ नियम होते हैं जैसे – 
+कोई नया बड़ा bug नहीं होना चाहिए, कोड कवरेज कम से कम 80% होना चाहिए, 
+और कोई security issue नहीं होना चाहिए। अगर ये नियम पूरे होते हैं तो Quality 
+Gate Pass होता है, नहीं तो Fail। Jenkins में अगर Quality Gate fail हो जाए, 
+तो pipeline रुक जाती है ताकि खराब कोड deploy न हो।
+
+
+Ingress Controller क्या होता है? (Kubernetes)
+Short answer:
+Ingress Controller Kubernetes cluster के अंदर चलने वाला एक component है 
+जो Ingress resources को पढ़कर आपके HTTP/HTTPS traffic को सही Service/Pod 
+तक route करता है। यह अक्सर reverse proxy / load balancer की तरह काम करता है 
+और TLS termination, path/host-based routing, और सुरक्षा/observability जैसी सुविधाएँ देता है।
+
+क्यों चाहिए?
+
+NodePort/LoadBalancer से आप सीधे service expose कर सकते हैं, लेकिन:
+
+हर service के लिए अलग external LB महँगा और जटिल हो जाता है।
+Hostname या path के आधार पर advanced routing मुश्किल है।
+
+
+Ingress + Ingress Controller के साथ:
+
+एक ही entry point (DNS) से multiple apps serve कर सकते हैं।
+foo.example.com और bar.example.com या /api, /web जैसे paths को अलग-अलग services तक route 
+कर सकते हैं।
+TLS/Certificates centrally manage हो जाते हैं।
 
 
 
 
----How to check load in pod---
+Core Concepts
 
-To identify which pod is under load, we can:
-	1.	Use kubectl top pod to see CPU/memory usage.
-	2.	Check pod logs for errors or latency.
-	3.	Use monitoring tools like Prometheus/Grafana or AWS CloudWatch for metrics and dashboards.
-	4.	In some setups, service mesh metrics (Istio/Linkerd) can show per-pod request load.
-These methods help pinpoint the pod experiencing high load in production.”
+Ingress Resource: Kubernetes object जिसमें rules लिखते हैं (host, path, backend service+port).
+Ingress Controller: वह software जो इन rules को पढ़कर वास्तविक proxy/LB configure करता है।
+Common Controllers:
+
+NGINX Ingress Controller
+Traefik
+HAProxy
+Cloud-specific: AWS ALB Ingress Controller, GKE Ingress, Azure Application Gateway Ingress, etc.
 
 
----- how to rollback in real time--
 
-In production, to rollback a Deployment: first check rollout status, then check revision history. Use kubectl rollout undo to revert to previous or specific revision. Monitor pods and application after rollback to ensure stability. Rollbacks are handled at the Deployment/ReplicaSet level, not individual pods, ensuring zero downtime.”
 
+यह कैसे काम करता है (Flow)
+
+आप एक Ingress YAML बनाते हैं जिसमें host/path routing rules हैं।
+Ingress Controller (cluster के अंदर एक Deployment/DaemonSet) इन rules को watch करके अपनी 
+internal config बनाता है।
+External traffic DNS/LB से Controller तक आता है।
+Controller reverse proxy की तरह सही Kubernetes Service को request forward करता है, 
+जो Pods तक जाता है।
+(Optional) Controller TLS terminate कर देता है और HTTP → Service तक plain traffic भेजता है।
