@@ -1,0 +1,267 @@
+Was console user id and pasword.
+
+s.wasadmin
+
+s3cur3m3
+ 
+importent command
+ 
+checking the data is cussuming last 48h--du -m $(find . -type f -mtime +2 -exec ls "{}" \;) + | awk '{sum+=$1} END {print sum}'
+
+for removing this 48h running data this is command----------------->find . -type f -mtime +2 -exec ls "{}" \;
+
+find . -type f -mtime +2 -exec rm "{}" \;
+ 
+ 
+Importent command for checking error in  log and file
+
+SCTASK0682594----log remove note is persent in this task
+
+grep ' E ' SystemOut.log
+
+grep OutOfMemory SystemOut.log
+
+slflokydc
+
+grep paa *
+ 
+more
+ 
+view
+
+ctrl + z
+ 
+cp -p
+ 
+grep e-business *
+ 
+05/08/2024
+ 
+ 
+shift G going down
+
+p-- going up
+
+N---after next errors
+ 
+df -g .
+
+df -h .
+ 
+File system linux
+ 
+df -h 
+
+du -sh *
+
+gzip
+
+\
+
+--------------------------------------------------------------------------------------------------------
+
+for the filesystem aix
+
+df -g(to check filesystem size and how much free)
+
+df -k .
+
+du -sh *(for linux)
+
+du -sg *(for aix) - to check files/folders size
+
+du -sm *|sort -n
+
+ls -lrt *20240820*(to list files that has 20240820 in the file)
+
+df -g .
+
+df -p .
+
+gzip
+
+ls -lrt ace_ACE_acew03_03*.2024-11-*
+
+gzip ace_ACE_acew03_03*.2024-11-*
+ 
+-------------------------------------------------------------------------------------------------------
+
+cp file name and move to arcive location
+
+echo > file name fir nallyfy the file 
+
+change the file name in today date
+
+mv file name filename11302014
+
+gzip file name 
+
+mv to file in actule location 
+
+--------------------------------------------------------------------------------------------
+
+grep errormsg *
+ 
+ 
+confirm whether errors exist 
+
+grep -i 'error' Filename
+ 
+In websphere any issue checking logfile
+
+1st JVM log like SystemOut.log and SystemErr.log
+
+----------------------------------------------------------------------------------------------------
+
+Log checking useg command
+ 
+go to the log path and open the systemout logfile
+ 
+->more fileName
+
+-> / E --show you any error msg
+ 
+-> / and put paticular error msg
+ 
+ 
+-> grep e-business * -check when started our jvm
+ 
+-> tail f1000 logfilename check recent file
+ 
+--------------------------------------------------------------------------------------------------------
+
+deletion old file
+
+ls -lt
+
+rm *20250403*
+
+rm jitdump.2021*
+
+for zip old log onces
+
+gzip *2025042*
+
+----------------------------------------------------------------------------
+
+File put inside server command
+ 
+scp -r MY_ID@saflokydcetsa92:/home/MY_ID/trust.p12 .
+ 
+scp -r MY_ID@slgramihqetsa94:/home/MY_ID/edo-kafka-preprod-enterprise-software.document-filenet.dev.jks .
+ 
+File get into the server
+ 
+scp -p -r trust.p12 MY_ID@slgramihqetsa94:/tmp/himanshu.r
+ 
+-----------------------------------------------------------------------------------------------
+
+soft link create
+ 
+ln -sf slcmfxd001.info53.com.crt cmmarkettrade-demo.info53.com.crt
+ 
+gzip *25.11.02*
+ 
+------------------------------------------------------------------------------------------------------------
+
+find out 48h 
+
+du -m $(find . -type f -mtime +2 -exec ls "{}" \;) + | awk '{sum+=$1} END {print sum}'
+ 
+----------------------------------------------------------------------------------------------------------
+
+Find the directories .jks file is in and goes to by using below command,
+
+find /opt/et/WAS -type f -name "*np.jks" 2>/dev/null
+
+Then, navigate to the directory by cd
+
+Then, back up old cert,
+
+cp np.jks /opt/et/WAS/9.0/apps/shared/secure/np.jks
+
+Then use below command to copy .jks,
+
+scp MY_ID@server:/opt/et/mqshared/certificates/appcerts/jksfiles/xxxx.jks .
+
+Keep the permissions of .jks as before
+
+chmod
+
+----------------------------------------------------------------------------------------------------
+
+MQ cert check
+
+Expiry Date Verification process:
+
+Login to the server (himanshu_server) as mqm
+
+cd /var/mqm/qmgrs/qmge_name/ssl
+
+ls -lrt
+
+drwxr-x---. 2 mqm mqm    48 Dec 11 2019 stg
+
+drwxr-s---. 2 mqm mqm   218 Jan 11 2023 bak
+
+-rwxrwx---. 1 mqm mqm   616 Jan 19 2023 rename_53CA.sh
+
+-rw-------. 1 mqm mqm   193 Jan 19 2023 key.sth
+
+-rw-------. 1 mqm mqm    80 Jan 19 2023 key.rdb
+
+-rwx------. 1 mqm mqm  9284 Feb 24 16:19 RTPQ91.01.p12
+
+-rw-------. 1 mqm mqm 45088 Feb 24 16:19 key.kdb.20250224
+
+-rw-------. 1 mqm mqm 45088 Feb 24 16:19 key.kdb
+
+runmqakm -cert -list -db key.kdb -stashed
+
+Certificates found
+ 
+runmqakm -cert -list -db key.kdb -stashed -label servername91.01
+
+or
+
+runmqakm -cert -details -db key.kdb -stashed -label ibmwimanshheremqappname91.01
+
+you will find the below expiry date after you run this step:5
+
+Not After : April 10, 2027 7:59:59 PM EDTS
+
+-----------------------------------------------------------------------------------------------
+ 
+ 
+if you are create the backup file
+ 
+like mv http.conf http.conf_08012026
+ 
+you want to create the copy of file please run this command.
+ 
+cp -rp httpd.conf_cmpadmin_07012026 httpd.conf
+
+
+checking the any changes last two day.
+
+find . -type f -mtime -2
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
