@@ -995,12 +995,12 @@ option me node reboot/replace karta hoon.
 
 ✅ 1. Node ka exact reason dekho
 Sabse pehle:
-Shellkubectl describe node <node-name>Show more lines
+Shellkubectl describe node <node-name>
 Yahan se pata chalega issue kya hai — DiskPressure, MemoryPressure, NetworkUnavailable, kubelet crash, CNI issue, etc.
 
 ✅ 2. Kubelet ko restart karo
 Node par SSH karke:
-Shellsudo systemctl restart kubeletShow more lines
+sudo systemctl restart Kubelet
 80% cases me kubelet restart se node Ready ho jaata hai.
 
 ✅ 3. CNI (aws-cni / calico) check karo
@@ -1009,19 +1009,433 @@ Shellkubectl -n kube-system get pods | grep cnikubectl -n kube-system logs <aws-
 
 ✅ 4. Disk full? Clean karo
 Disk 100% ho jaye to kubelet hang ho jata hai.
-Shelldf -hdocker system prune -afsudo journalctl --vacuum-size=100MShow more lines
+Shelldf -hdocker system prune -afsudo journalctl --vacuum-size=100M
 
 ✅ 5. Node API server se connect ho raha hai?
 Security group, network route table, ENI check karo.
 Agar node API server ko hit nahi kar pa raha → NotReady.
 
 ✅ 6. Container runtime restart
-Shellsudo systemctl restart containerdShow more lines
+sudo systemctl restart containerdShow more lines
 Ya
-Shellsudo systemctl restart dockerShow more lines
+sudo systemctl restart dockerShow more lines
 
 ✅ 7. Final fix — reboot or replace
 Shellsudo rebootShow more lines
 Aur agar phir bhi issue na solve ho:
 Node ko terminate kar do.
 EKS managed node group automatically naya healthy node bana dega.
+
+
+------------------------------------------------------------------------
+
+Developer Pushes Code → GitHub
+             |
+             | (Webhook triggers)
+             ↓
+         Jenkins / GitLab CI
+             |
+       (Maven/Gradle Build)
+             |
+      Creates JAR/WAR/Image
+             |
+             ↓
+       JFrog Artifactory
+             |
+     Deploy to Server/Cloud
+
+
+     ------------------------------
+
+     🛠 --Maven
+Purana but reliable builder. Project ko compile/test karke output deta hai.
+XML config hoti hai (pom.xml).
+
+⚡ Gradle
+Maven ka fast version. Flexible + modern.
+Groovy/Kotlin config hoti hai (build.gradle).
+
+#### JUnit   (unit testing)
+
+JUnit is a testing framework for Java.
+It helps developers write unit tests to check if their Java code is working correctly.
+
+-----------------------
+🏭 JFrog Artifactory
+Build ke baad jo JAR/WAR/Docker image banta hai, woh yahan store hota hai.
+Like — software warehouse.
+------👉 JUnit tests the OUTPUT
+👉 SonarQube tests the QUALITY & SAFETY
+
+------
+FOR integration testing --
+Tests multiple components together
+(database + backend + API + services).
+, we using POSTMAN CLI (newman)
+
+Unit Tests (JUnit) → logic is safe
+2️⃣ API Tests (Newman) → endpoints are safe
+This validates that different components—like API + DB—work well together.”
+------
+
+🔔 Webhook
+Doorbell jaisa system.
+Event hote hi ek system dusre ko automatically notify karta hai.
+Jaisa:
+GitHub ne push dekha → Jenkins ko call kar diya → Pipeline start.
+
+
+------------------------------------------------------------------------
+
+CloudFront ka EU region me latency mostly 4 reasons ki wajah se hoti hai — cache thanda 
+(cold cache), origin slow, caching galat set ki hui, ya network/routing issue. 
+Pehle main CloudFront ka cache-hit ratio check karta hoon, phir origin (S3/ALB/EC2) 
+ki response time dekh Leta hoon. Fir ensure karta hoon ki EU ke closest 
+edge locations use ho rahe ho. Next, HTTP/3 enable karta hoon, TTLs sahi 
+karta hoon, Price Class ko All kar deta hoon, aur Origin Shield enable 
+karta hoon taaki caching better ho. Main ye bhi check karta hoon ki WAF 
+rules latency bada to nahi rahe. Agar problem phir bhi rahe, to CloudFront 
+RUM se real user latency check karta hoon aur 
+AWS Global Accelerator use karke routing fast kar deta hoon.”
+
+
+Cold cache ka matlab hai CloudFront ke edge servers ke paas aapki file pehle 
+se store nahi hai. Isliye jab user request karta hai, CloudFront ko pehle origin 
+(S3/ALB/EC2) se 
+data lana padta hai — jisse time zyada lagta hai.
+
+-------
+Origin slow ka matlab hai ki aapka backend — jaise S3, EC2, ALB, API — 
+response dene me hi slow hai. Agar origin hi slow hai, to CloudFront chahe 
+jitna fast ho, latency fir bhi badh jaati hai.
+
+Common causes:
+
+EC2 CPU high
+Database slow
+ALB response time badh gaya
+S3 latency from distant region
+Heavy code processing
+
+
+-----
+GitHub → Webhook → Jenkins → Build & Compile (maven &gradle) → Unit Tests → Integration Tests 
+→ SonarQube Scan → JFrog Artifactory → Deployment
+
+
+######CI-CD############# PIPELINE FLOW
+Pehle main apna source code GitHub pe 
+maintain karta hoon, jahan se main GitHub Webhook configure karta hoon taaki jab 
+bhi koi developer code push kare, Jenkins pipeline automatically trigger ho jaaye. 
+Jenkins trigger hote hi sabse pehla stage hota hai build and compile, jisme Maven 
+ya Gradle code ko compile karke JAR/WAR generate karta hai. Build ke baad main 
+Unit Testing chalata hoon JUnit ya TestNG se, taaki individual methods ya 
+logic sahi kaam kar rahe ho. Uske baad Integration Testing hoti hai jisme main 
+Newman/Postman ka use karta hoon, jo ensure karta hai ki API, 
+database, aur services ek‑dusre ke saath smoothly work karein. Phir main 
+SonarQube scan run karta hoon taaki code quality, bugs, vulnerabilities, 
+aur security issues detect ho sakein — agar SonarQube Quality Gate fail ho 
+jaata hai, toh pipeline deploy nahi hoti. Jab sab checks pass ho jaate hain, 
+toh main final build artifact ko JFrog Artifactory mein upload karta hoon for 
+versioned, centralized storage. Last stage mein Jenkins artifact ko deploy karta hai — 
+jaise AWS EC2, Tomcat, WebSphere, Docker ya Kubernetes — taaki application production 
+ya staging environment mein smoothly run ho sake. Overall yeh complete end‑to‑end 
+CI/CD pipeline automated, secure, aur reliable deployment ensure karti hai.”
+
+Unit test = logic check
+Integration test = system check
+SonarQube = quality + security
+JFrog = artifact storage
+Deployment = final release
+
+
+
+########
+ “CPU/Memory Normal But App Slow”
+Most common root causes:
+
+DB slow (80% cases)   (Throttling issue)
+ALB latency
+Disk I/O  (gp2 to gp3)
+Thread/connection pool
+Slow dependencies
+Network latency
+Incorrect Auto Scaling triggers
+TargetResponseTime (agar yeh high → app slow)
+
+
+#### Canary
+
+Canary Deployment ek release strategy hai jisme new version ko ek chhote “subset” 
+of users ke liye roll out kiya jata hai, baaki users purane version 
+(stable prod) pe hi rehte hain.
+Agar new version stable lagta hai → rollout expand.
+Agar issues milte hain → rollback easy & fast.
+
+🎯 One‑Line Definition
+
+Canary Deployment = New release ko 1–5% traffic par test karna, phir
+gradually 10% → 25% → 50% → 100% traffic par rollout karna.
+
+## POD to AWS service
+OIDC provider → IAM trust policy/role → ServiceAccount → Pod
+
+
+------------------------------------------------------------------------
+
+CloudTrail = Audit logs of API calls  ( (full history))
+[eg:- 🎥 Records every action:
+“User X opened locker 32 at 3:12 PM from IP A.B.C.D” ]
+
+example :-  EC2 stopping
+-----------------------------------------------------------------------
+EventBridge = Real-time events for automation  (only recent events)
+🔔 Alerts in real time:
+“Locker 32 was opened — send SMS!”
+
+example :- ec2:StopInstances called by user
+
+---------------------------------------------------------------
+
+🔔🔔EventBridge → SQS → Lambda → S3 archive pipeline, which is the standard 
+AWS pattern to store EC2 (or any AWS) events for long-term retention.🔔🔔
+
+EventBridge cannot directly store events in S3.
+So Lambda(Processes and uploads event to S3) acts as a bridge between them.
+
+
+After Maven completes the build and tests, we execute mvn sonar:sonar to send 
+the code, test results, coverage, and code quality metrics to SonarQube. Maven automatically 
+uses the internal SonarScanner plugin, so no extra installation is needed.
+
+We typically maintain around 70–80% code coverage using JaCoCo integrated with Maven
+JaCoCo is a code coverage tool that generates coverage reports during Maven tests.
+
+Our Quality Gate requires at least 70% coverage.
+If coverage goes below that, the pipeline fails.
+
+✅ 1. What is pom.xml?
+POM = Project Object Model
+pom.xml is the main configuration file of a Maven project.
+Isme hota hai:
+
+Project dependencies (JARs you need)
+Plugins (JaCoCo, Sonar, Surefire, etc.)
+Build instructions
+Version, groupId, artifactId
+Repositories
+Profiles
+
+
+CloudTrail = Records events (logging)
+EventBridge = Reacts to events (automation)
+
+CloudTrail records all API activity for auditing and security.
+
+Simple Example (VERY IMPORTANT)
+❌ CloudTrail Example
+CloudTrail log (after the fact):
+User Anmol called ec2:TerminateInstances at 10:32 AM
+
+No action taken. Just stored.
+
+✔ EventBridge Example
+EventBridge can say:
+If EC2 instance is terminated → trigger SNS → send alarm
+
+Updated CICD 
+
+GitHub
+ Webhook → Jenkins
+1. Checkout code
+2. Build & Compile (Maven / Gradle)
+3. Unit Tests (JUnit)
+4. Coverage (JaCoCo)
+5. SonarQube (SAST)
+6. SCA (Trivy)
+7. Deploy to Dev
+8. Integration Testing (Newman)
+9. DAST (Invicti)
+
+
+-----
+Trivy ek security scanner hai jo aapke project ke:
+
+Libraries
+Dependencies
+Docker images
+OS packages
+SBOM
+
+…sab check karta hai vulnerabilities ke liye.
+⭐ Simple language mein:
+
+“Trivy bata deta hai ki aapke project ke andar jo open-source libraries 
+use ho rahi hain unme koi known security bug (CVE) toh nahi hai.”
+
+Trivy → code aur libraries scan karta hai
+Invicti → running website/API ko scan karke security holes dhoondta hai
+⭐ Invicti kya detect karta hai?
+
+SQL Injection
+XSS
+Authentication flaws
+Authorization bypass (IDOR)
+Insecure cookies
+
+
+######################
+1. Cosign image signing + OPA/Kyverno validation
+2. Velero for EKS backups
+##################################
+
+1️⃣ Cosign Image Signing + OPA/Kyverno Validation — (Supply Chain Security ka core funda)
+🔥 Problem kya hota hai?
+Jab tum Docker image build karke ECR/DockerHub/JFrog me push karte ho…
+koi guarantee nahi hoti ki image kisi ne tamper nahi kiya,
+ya woh trusted source se aayi hai.
+Ispe attacks hote hain:
+
+Image replace ho jaye
+Tag spoofing (fake v2.0 image)
+Malicious image inject ho jaye
+
+
+🟢 Cosign kya karta hai? (Simple Explanation)
+Cosign ek tool hai jo Docker image ko digitally sign karta hai.
+Jaise Aadhaar me fingerprint hota hai → identity confirm karta hai…
+same waise Cosign image ka identity proof banata hai.
+How it works:
+
+Tum Docker image build karte ho
+Tum Cosign se us image ko sign karte ho
+Signature ECR ke “signature store” me save hota hai
+Jab EKS me deploy hoti hai → cluster check karta hai
+“Is image ka signature valid hai?”
+
+Agar valid → deploy
+Agar invalid/unsigned → deployment block 😎
+
+🟣 OPA / Kyverno kya karte hain?
+OPA (Open Policy Agent) ya Kyverno Kubernetes ke “police officer” hote hain.
+Har image cluster me deploy hone se pehle admission controller usko check karta hai.
+Example policy:
+
+“ONLY signed images allowed”
+“runAsNonRoot = true hona chahiye”
+“no image with tag :latest allowed”
+“Images must come from ECR only”
+
+Combined flow:
+Cosign → image sign karta hai  
+Kyverno/OPA → check karta hai ki image signed hai ya nahi  
+
+Ye pure flow ko bolte hain Supply Chain Security.
+
+🎯 Final Summary (1)
+✔ Cosign = signature banata hai
+✔ OPA/Kyverno = signature verify karke only trusted image deploy karte hain
+Isse pipeline enterprise‑grade secure ban jati hai.
+
+------------------------------
+
+3️⃣ Velero for EKS Backups — Kubernetes ka Time‑Machine
+🔥 Problem kya hai EKS me?
+EKS me ye sab Kubernetes cluster me stored hota hai:
+
+Deployments
+ConfigMaps
+Secrets
+Services
+Ingress
+Persistent Volumes (EBS)
+
+Agar cluster corrupt / accidental delete ho jaye →
+Koi backup nahi to poora infra dobara banana padega.
+
+🟢 Velero kya karta hai?
+Velero = Kubernetes ka backup + restore tool.
+Velero can back up:
+✔ Entire namespaces
+✔ YAML manifests (deployments, services, ingresses, secrets…)
+✔ Persistent Volume snapshots (EBS snapshots)
+✔ Cross-region copy
+✔ Schedule-based automatic backups
+Example:
+Tum bolte ho:
+“Har raat 1 baje dev cluster ka backup le lo
+aur EBS volume ka snapshot S3 me store karo
+aur ek copy dusre region me bhejo.”
+Velero will do it automatically.
+
+🟣 Restore scenario:
+
+Cluster crash
+Migration
+Cross-region DR
+Accidental delete
+
+1 command:
+velero restore create --from-backup my-backup
+
+And poora cluster wapis aa jata hai —
+including PV + apps + configs.
+---------------------------------------------------------------------
+####Falco → Runtime scanning (jab pod chal rha hota hai) ###
+
+## my CI/CD ##
+
+Dev environment
+
+Code
+Github
+Webhook
+Gitlab (CI/CD)
+Build & compile (maven & gradle)
+Unit Testing (Junit)
+JaCoCo(code coverage)
+Sonarcube (sonarscanner + Quality gate)
+get the artifact ( abc.jar)
+Build the image
+Perform SCA (Trivy) 
+run the image in EC2 stadalone dev server for testing
+Perform integration testing (NEWMAN ) (POSTMAN CLI)
+
+
+Staging env
+
+Perform Trivy (Full /strict scan)
+Perform integration testing (NEWMAN ) (POSTMAN CLI) (OPTIONAL : AGAIN) (Full SCAN)
+Push artifact to Jfrog
+Sign the image (abc.jar) with Cosign 
+Verify with Kyverno
+Perform DAST (Invicti) (Final stage before pre production)
+
+Production
+
+push image from ECR to EKS 
+Add Services (NODEPORT , ALB) (Target Groups)
+Cluster autoscaler
+Persident volume
+HPA (for pod scalaibility)
+IRSA for service accounts also
+Put ALB domain in cloudfront
+And use cloudfront Alias in route 53 hosted zone (Use Failover & Cross zone routing)
+Also store secertsin AWS KMS 
+
+For Alerting & Logs
+Falco (For collectiong logs)
+Node logs (Cloudwatch)
+EKS Logs (prometuehs and Grafana)
+Events (Cloudtrail to Eventbridge to SQS to Lambda fn to SNS/Dynamodb)
+
+For backup & DR
+
+Use AWS backup for Ec2 snapshot (Timely backup)
+Pods running on ec2 but backend is on Oracle RDS (Cross zone replica allow)
+Store datanbase date in S3 (lifecycle rules ( IA to glacier)
+
+
+
+#############################################
+----------------------------------------------------------------------------
