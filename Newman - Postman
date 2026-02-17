@@ -1,0 +1,102 @@
+-----NEWMAN RUN-----
+
+# Basic run
+newman run Express53_Integration_Tests.postman_collection.json -e dev.postman_environment.json
+
+# With HTML report
+npm install -g newman newman-reporter-htmlextra
+newman run Express53_Integration_Tests.postman_collection.json \
+  -e dev.postman_environment.json \
+  -r htmlextra \
+  --reporter-htmlextra-export reports/index.html
+
+
+  ---------------------------------------------
+
+  ✅ 1. SUCCESSFUL NEWMAN RUN (All Tests Passed)
+When all API tests pass, Newman prints output like this:
+→ Express53 Integration Tests
+
+  → 1) Login
+    ✓ Status is 200/201
+    ✓ Token is present
+
+  → 2) Get Accounts
+    ✓ Status is 200
+    ✓ Accounts array present
+
+  → 3) Create User
+    ✓ Status is 200/201
+    ✓ userId returned
+
+  → 4) Get User by ID
+    ✓ Status is 200
+    ✓ User payload looks correct
+
+  → 5) Delete User
+    ✓ Status is 200/204
+
+    ❌ 2. FAILED NEWMAN RUN (Some Tests Failed)
+If anything goes wrong (login fails, token missing, wrong status code), you will see this:
+→ Express53 Integration Tests
+
+  → 1) Login
+    ✓ Status is 200/201
+    ✗ Token is present
+      expected auth token to exist
+
+  → 2) Get Accounts
+    ✗ Status is 200
+      expected response code 200 but got 401
+
+┌─────────────────────────┬──────────┬──────────┬────────┐
+│                         │ Executed │ Passed   │ Failed │
+├─────────────────────────┼──────────┼──────────┼────────┤
+│              Iterations │       1  │     1    │    0   │
+│                Requests │       5  │     3    │    2   │
+│                 Tests   │      12  │     9    │    3   │
+└─────────────────────────┴──────────┴──────────┴────────┘
+
+✗ 3 tests failed.
+
+👉 This shows exactly which API failed, why it failed, and how many tests failed.
+
+🖥️ 3. HTML EXTRA REPORT (Most Used Report)
+When you use:
+newman run collection.json -e dev.json -r htmlextraShow more lines
+You get a beautiful HTML report:
+✔ Shows:
+
+Each request
+Request headers/body
+Response headers/body
+PASS/FAIL for each test
+Execution time
+Summary dashboard
+
+Example Visual (text description):
+[HTML Dashboard]
+------------------------------
+Collection: Express53 Integration Tests
+
+Requests:
+1. Login                PASS
+2. Get Accounts         PASS
+3. Create User          PASS
+4. Get User by ID       PASS
+5. Delete User          PASS
+
+Total Tests: 12 Passed: 12 Failed: 0
+Execution Time: 1.2 sec
+------------------------------
+
+Very clean — perfect for QA, DevOps, managers, and evidence in CI/CD.
+
+🧪 4. JUnit XML Report (CI/CD Use)
+If you run:
+newman run collection.json -e dev.json -r junit --reporter-junit-export results.xmlShow more lines
+You get an XML file like this:
+✔ SUCCESS Example:
+XML<testsuite tests="12" failures="0">  <testcase classname="Login" name="Status is 200" />  <testcase classname="Login" name="Token is present" /></testsuite>Show more lines
+❌ FAILURE Example:
+XML<testsuite tests="12" failures="3">  <testcase classname="Login" name="Token is present">    <failure message="expected auth token to exist"></failure>  </testcase></testsuite>Show more lines
