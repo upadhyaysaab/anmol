@@ -1,0 +1,241 @@
+{
+  "id": "b4e6f3dd-3e3b-4a2a-bd14-9c6a5b6a9a20",
+  "name": "dev",
+  "values": [
+    { "key": "baseUrl", "value": "https://express.53.com", "enabled": true },
+    { "key": "username", "value": "test.user@demo.com", "enabled": true },
+    { "key": "password", "value": "SuperSecret@123", "type": "secret", "enabled": true },
+    { "key": "authToken", "value": "", "enabled": true },
+    { "key": "userId", "value": "", "enabled": true }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_using": "Postman/10.x",
+  "_postman_exported_at": "2026-02-18T01:18:00+05:30",
+  "_postman_exported_version": "2.1.0"
+}
+
+
+-----NEWMAN RUN-----
+
+# Basic run
+newman run Express53_Integration_Tests.postman_collection.json -e dev.postman_environment.json
+
+# With HTML report
+npm install -g newman newman-reporter-htmlextra
+newman run Express53_Integration_Tests.postman_collection.json \
+  -e dev.postman_environment.json \
+  -r htmlextra \
+  --reporter-htmlextra-export reports/index.html
+
+
+  ---------------------------------------------
+
+  ✅ 1. SUCCESSFUL NEWMAN RUN (All Tests Passed)
+When all API tests pass, Newman prints output like this:
+→ Express53 Integration Tests
+
+  → 1) Login
+    ✓ Status is 200/201
+    ✓ Token is present
+
+  → 2) Get Accounts
+    ✓ Status is 200
+    ✓ Accounts array present
+
+  → 3) Create User
+    ✓ Status is 200/201
+    ✓ userId returned
+
+  → 4) Get User by ID
+    ✓ Status is 200
+    ✓ User payload looks correct
+
+  → 5) Delete User
+    ✓ Status is 200/204
+
+    ❌ 2. FAILED NEWMAN RUN (Some Tests Failed)
+If anything goes wrong (login fails, token missing, wrong status code), you will see this:
+→ Express53 Integration Tests
+
+  → 1) Login
+    ✓ Status is 200/201
+    ✗ Token is present
+      expected auth token to exist
+
+  → 2) Get Accounts
+    ✗ Status is 200
+      expected response code 200 but got 401
+
+┌─────────────────────────┬──────────┬──────────┬────────┐
+│                         │ Executed │ Passed   │ Failed │
+├─────────────────────────┼──────────┼──────────┼────────┤
+│              Iterations │       1  │     1    │    0   │
+│                Requests │       5  │     3    │    2   │
+│                 Tests   │      12  │     9    │    3   │
+└─────────────────────────┴──────────┴──────────┴────────┘
+
+✗ 3 tests failed.
+
+👉 This shows exactly which API failed, why it failed, and how many tests failed.
+
+🖥️ 3. HTML EXTRA REPORT (Most Used Report)
+When you use:
+newman run collection.json -e dev.json -r htmlextraShow more lines
+You get a beautiful HTML report:
+✔ Shows:
+
+Each request
+Request headers/body
+Response headers/body
+PASS/FAIL for each test
+Execution time
+Summary dashboard
+
+Example Visual (text description):
+[HTML Dashboard]
+------------------------------
+Collection: Express53 Integration Tests
+
+Requests:
+1. Login                PASS
+2. Get Accounts         PASS
+3. Create User          PASS
+4. Get User by ID       PASS
+5. Delete User          PASS
+
+Total Tests: 12 Passed: 12 Failed: 0
+Execution Time: 1.2 sec
+------------------------------
+
+Very clean — perfect for QA, DevOps, managers, and evidence in CI/CD.
+
+🧪 4. JUnit XML Report (CI/CD Use)
+If you run:
+newman run collection.json -e dev.json -r junit --reporter-junit-export results.xmlShow more lines
+You get an XML file like this:
+✔ SUCCESS Example:
+XML<testsuite tests="12" failures="0">  <testcase classname="Login" name="Status is 200" />  <testcase classname="Login" name="Token is present" /></testsuite>Show more lines
+❌ FAILURE Example:
+XML<testsuite tests="12" failures="3">  <testcase classname="Login" name="Token is present">    <failure message="expected auth token to exist"></failure>  </testcase></testsuite>Show more lines
+
+
+
+
+
+#####  DAST (Invcti)
+
+🟩 Super Simple Example
+❌ Before (Bad)
+
+Your EC2 allows TLS 1.0
+Certificate is close to expiry
+No HSTS header
+
+DAST report → fails
+
+✔ After (Good)
+
+Only TLS 1.2 and TLS 1.3 allowed
+Certificate updated
+Headers fixed
+
+DAST report → passes
+
+🟦 One‑Line Summary
+TLS/SSL is the security system that protects data between users and your EC2 application.
+DevOps manages and fixes TLS/SSL settings because they belong to infrastructure, not code.
+
+-----------------------------
+
+How Security Policies work (simple explanation)
+A security policy is a bundle that defines:
+
+Which TLS versions are allowed
+Which ciphers are allowed
+Whether TLS 1.3 is supported
+
+Example policies:
+
+
+Policy NameTLS SupportELBSecurityPolicy-2016-08TLS 1.0, 1.1, 
+1.2ELBSecurityPolicy-TLS12-1-2017-01Only 
+TLS 1.2ELBSecurityPolicy-TLS13-1-2-2021TLS 1.2 + TLS 1.3
+
+############# Super Simple Summary
+Check TLS version:
+
+Open EC2 → Load Balancers
+Select your ALB
+Go to Listeners tab
+Click HTTPS:443 → Edit
+Change Security Policy to:
+
+ELBSecurityPolicy-TLS13-1-2-2021
+----------------
+ALB → Look at Security Policy
+EC2 → Check NGINX/Apache config or use curl test
+----------------
+Update TLS version:
+
+ALB → Change Security Policy
+EC2 → Modify ssl_protocols in config
+
+Certificate does NOT auto-update.
+
+
+
+###✅ How to Check a Certificate & How to Update (Renew) It
+
+How to CHECK Certificate on AWS ALB
+✅ Method 1: Check using AWS Console (Easiest)
+
+Go to: EC2 → Load Balancers
+Select your Application Load Balancer (ALB)
+Go to Listeners tab
+Click HTTPS : 443 → View/Edit
+You will see:
+
+Certificate: arn:aws:acm:region:account:certificate/xxxx
+
+
+Click the certificate ARN → It opens ACM (AWS Certificate Manager.)
+ACM will show:
+
+Domain name
+Certificate status (Issued / Expired / Inactive)
+Expiration date
+Issuer
+Renewal eligibility
+
+How to Update Certificate on AWS ALB
+
+Jab AWS ACM tumhare certificate ko auto‑renew karta hai, toh woh hamesha naya 
+certificate banata hai, jiska ARN bhi naya hota hai. Isliye ALB automatically us 
+par switch nahi karta. Tumhe manually ALB ke HTTPS listener me jaa kar naya ARN 
+select karna padta hai. Process simple hai: EC2 console me Load Balancer kholo, 
+443 listener pe “Edit” karo, phir dropdown me se fresh renewed certificate 
+(latest expiry date wala) choose karo aur save kar do. Jaise hi tum new ARN select 
+karte ho, ALB turant updated certificate use karne lagta hai—certificate renewal 
+future me fir se automatic hoga, lekin next renewal par fir se ek naya ARN banega, 
+jise tumhe manually ya automation se dobara attach karna hoga. Matlab ACM renewal 
+automatic hota hai, par ALB ko naya ARN manually attach karna padega, kyunki 
+AWS automatically production load balancer ki 
+certificate configuration change nahi karta, taa ki koi risk na ho.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
