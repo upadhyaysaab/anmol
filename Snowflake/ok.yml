@@ -1390,7 +1390,7 @@ Dev environment
 Code
 Github
 Webhook
-Gitlab (CI/CD)
+Gitlab /jenkins (CI/CD)
 Build & compile (maven & gradle)
 Unit Testing (Junit)
 JaCoCo(code coverage)
@@ -1410,6 +1410,7 @@ Push artifact to Jfrog
 Sign the image (abc.jar) with Cosign 
 Verify with Kyverno
 Perform DAST (Invicti) (Final stage before pre production)
+Canary test Also
 
 Production
 
@@ -1424,18 +1425,109 @@ And use cloudfront Alias in route 53 hosted zone (Use Failover & Cross zone rout
 Also store secertsin AWS KMS 
 
 For Alerting & Logs
-Falco (For collectiong logs)
+Falco → Runtime scanning
 Node logs (Cloudwatch)
 EKS Logs (prometuehs and Grafana)
 Events (Cloudtrail to Eventbridge to SQS to Lambda fn to SNS/Dynamodb)
+
 
 For backup & DR
 
 Use AWS backup for Ec2 snapshot (Timely backup)
 Pods running on ec2 but backend is on Oracle RDS (Cross zone replica allow)
 Store datanbase date in S3 (lifecycle rules ( IA to glacier)
+Velero for K8 backup
 
 
 
 #############################################
 ----------------------------------------------------------------------------
+
+Falco:-
+
+Falco (stdout)
+      ↓
+Container Logs (/var/log/containers)
+      ↓
+Fluent Bit / CloudWatch Agent
+      ↓
+CloudWatch Logs
+
+-------Docker file creation-----
+Backend (JAVA)
+# ---------- Runtime stage ----------
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+## mUST IMP to prevent vulnealbitiy
+RUN apt-get update && apt-get upgrade -y 
+# Copy the built jar
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose your app port if needed (e.g., 8080)
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/app/app.jar"]
+
+
+-----------------------
+Frontend (Ngnix + React)
+
+
+FROM nginx:stable-alpine
+COPY build/ /usr/share/nginx/html/
+
+
+
+To reduce vulnerabilities, we use nginx:stable-alpine for frontend and Temurin 
+JRE for backend. This helps us pass Trivy scans with fewer CVEs.”
+
+
+-------
+
+The SBOM JSON file is not used by the application in production.
+It is used by our security and compliance teams to track all dependencies inside the image, monitor vulnerabilities, meet banking regulations, and quickly respond to incidents like zero-day vulnerabilities.
+In banking, SBOM is a key part of supply‑chain security.”
+
+##COMMAND
+trivy sbom --format cyclonedx --output sbom.json myimage
+#####
+CycloneDX is a standard format used to describe all components inside a software application or container image.
+
+It's like a structured JSON/XML file that lists:
+
+Libraries
+Dependencies
+Licenses
+Versions
+Packages
+Vulnerability metadata
+
+
+Fixing vulnerabilities
+When Trivy detects vulnerabilities in Docker images, we fix 
+them by upgrading the base image to a patched version 
+(e.g., moving from openjdk:11-slim to eclipse-temurin:11-jre-jammy).
+We also run apt-get update && apt-get upgrade to fix OS-level issues.
+For Java apps, we avoid Alpine images and use multi-stage Docker builds 
+to reduce vulnerability 
+
+
+6. Example: Before vs After Fix
+❌ Before (common banking issue)
+
+FROM openjdk:11-jre-slim
+COPY target/app.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]
+
+
+Trivy shows:
+HIGH: curl 7.68.0
+CRITICAL: OpenSSL 1.1.1f
+HIGH: libxml2
+
+After Fix (secure)
+
+FROM eclipse-temurin:11-jre-jammy
+RUN apt-get update && apt-get upgrade -y
+COPY target/app.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]
