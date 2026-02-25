@@ -136,3 +136,48 @@ For each employee, show:
 	•	Only include pay dates after April 1, 2024.
 
 
+
+WHAT YOU WILL BE DOING
+
+Strong pod-level troubleshooting skills in AKS/EKS (not just restarting pods).
+Analyze application and DB (RDS, MySQL) performance issues.Deeply investigate and analyze application performance issues (Java, Grails, Hibernate), identifying root causes and implementing solutions.
+Oversee the monitoring of our SaaS applications and underlying infrastructure (Kubernetes on AWS and Azure, VPN connections, customer applications, Elastic Search, MySQL) for alerts and performance issues.
+ Strong understanding of basic computing concepts like DNS, IP addressing, Networking, and LDAP.
+Effectively participate and contribute in on-call escalations with a strong operational mindset and provide technical guidance during critical incidents.
+Proactively communicate with customers on technical issues when required.
+Ability to guide junior engineers when needed technically.
+Manage the full lifecycle of alerts, incidents, and service requests reported through FreshService, ensuring timely and accurate logging, prioritization, resolution, and escalation.
+Develop, implement, and maintain operational procedures, runbooks, and knowledge base articles to standardize incident resolution and service request fulfillment.
+Drive continuous improvement initiatives to optimize operational efficiency, reduce incident rates, and improve service request turnaround times.
+Collaborate with backend engineering and development teams to troubleshoot complex issues, identify root causes, and implement preventative measures.
+Ensure adherence to defined SLAs (Service Level Agreements) and KPIs (Key Performance Indicators) for operational performance.Maintain operational documentation, including system diagrams, contact lists, and escalation paths.
+Ensure compliance with relevant security and compliance policies.
+Plan and coordinate scheduled maintenance activities with minimal impact to service availability.
+
+WHAT YOU BRING
+
+Bachelor's degree in Computer Science, Information Technology, Engineering, or a related field.
+Minimum of 3+ years of experience in IT/Cloud operations and application support (specifically Java apps), with knowledge of cloud infrastructure (AWS and Azure).
+Strong experience with application support (Java, Grails, Hibernate) and performance analysis in a production environment, able to pinpoint a performance degradation through analysis.
+Strong understanding of cloud computing concepts, architectures, and services on both AWS and Azure platforms.
+Working knowledge of containerization and orchestration technologies, specifically Kubernetes.End-to-end technical accountability and operational ownership.Willingness to work in a 24/7 operating model.
+Experience managing and troubleshooting network connectivity, including VPNs and connections to external networks.
+Familiarity with monitoring tools and practices, with experience in setting up and responding to alerts.
+Hands-on experience with log management and analysis tools, preferably Elastic Search.
+Working knowledge of database systems, preferably MySQL, including L2 troubleshooting and performance monitoring.
+Experience with ITSM (IT Service Management) systems, preferably FreshService, including incident, problem, and service request management processes.
+Excellent problem-solving, analytical, and troubleshooting skills with a data-driven approach.Experience with Grafana systems and dashboards is a plus.
+Strong communication (written and verbal), interpersonal, and presentation skills.
+Ability to work effectively under pressure and manage multiple priorities in a fast-paced environment.
+Experience in developing and documenting operational procedures and runbooks.
+Experience with automation tools and scripting languages (e.g., Python, Bash) is a plus.
+Experience working in a SaaS environment is highly desirable.
+Working knowledge of database systems, preferably MySQL, including L2 troubleshooting and performance monitoring.
+Experience with ITSM (IT Service Management) systems, preferably FreshService, including incident, problem, and service request management processes.
+Excellent problem-solving, analytical, and troubleshooting skills with a data-driven approach.Experience with Grafana systems and dashboards is a plus.
+Strong communication (written and verbal), interpersonal, and presentation skills.
+Ability to work effectively under pressure and manage multiple priorities in a fast-paced environment.
+Experience in developing and documenting operational procedures and runbooks.
+Experience with automation tools and scripting languages (e.g., Python, Bash) is a plus.
+Experience working in a SaaS environment is highly desirable.
+
