@@ -78,3 +78,22 @@ copilot pipeline deploy         # Deploy pipeline
 copilot svc delete              # Delete service
 copilot env delete              # Delete environment
 copilot app delete              # Delete full app
+
+
+
+IAM Roles (Task Role vs Execution Role)
+Like Kubernetes service accounts, in ECS you have:
+🟩 Task Role (app permissions)
+Container uses this to access AWS services.
+Example:
+
+Access DynamoDB
+Read/write S3
+Read parameters from SSM
+
+🟦 Execution Role (ECS agent permissions)
+Used by ECS to:
+
+Pull images from ECR
+Fetch secrets
+Push logs to CloudWatch
