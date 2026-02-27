@@ -97,3 +97,43 @@ Used by ECS to:
 Pull images from ECR
 Fetch secrets
 Push logs to CloudWatch
+
+✅ FireLens is NOT a container.
+It is just an ECS feature (a config layer) that connects your app → Fluent Bit.
+✅ Fluent Bit IS the sidecar container.
+It runs as a second container inside your task.
+
+🔥 Real architecture (correct)
+Task
+├── App Container          (your application)
+└── Fluent Bit Container   (sidecar)
+
+
+Your App Container
+    ↓ (stdout logs)
+FireLens
+    ↓
+Fluent Bit (sidecar container)
+    ↓
+Destination (CloudWatch, S3, Kafka, Datadog…)
+
+
+CloudWatch → AWS’s built‑in logs + metrics + alarms tool (basic but cheap).
+Datadog → Full observability platform (logs, metrics, traces, APM, dashboards, alerts) with far more features & integrations.
+
+🟦 1. What they are
+✅ CloudWatch
+
+Native AWS monitoring service
+Handles logs, metrics, alarms
+Basic dashboards
+Limited UI
+Cheaper
+
+✅ Datadog
+
+Third‑party enterprise observability platform
+Full APM → logs, metrics, traces, profiling
+Beautiful dashboards
+AI-based anomaly detection
+Expensive
