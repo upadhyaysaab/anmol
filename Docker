@@ -7,3 +7,6 @@ docker run -it --name hostcont -v /home/ec2-user:/anmol --privileged=true ubuntu
 [root@ip-172-31-23-167 ec2-user]# docker tag myimage upadhyaysaab/newimg
 [root@ip-172-31-23-167 ec2-user]# docker push upadhyaysaab/newimg
 
+Strong hands-on experience with Docker and container fundamentals.
+Mandatory experience operating workloads on AWS ECS (EC2 and/or Fargate) in production environments.
+Strong Linux administration and troubleshooting skills (process, memory, networking basics, filesystem).
