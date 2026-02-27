@@ -60,3 +60,21 @@ In ECS deployments, the AppSpec file is considered the deployment revision. [doc
 
 Lambda Validation Functions
 Optional hooks that can approve/rollback deployments.
+
+
+--------------------------------------
+copilot init                    # Create new app + service
+copilot svc init                # Add a new service
+copilot env init                # Create an environment
+copilot env deploy              # Deploy environment
+copilot svc deploy              # Deploy service
+copilot svc status              # Check service status
+copilot svc logs -f             # Follow logs
+copilot svc exec                # Exec into container
+copilot svc manifest            # Edit service manifest
+copilot app deploy              # Deploy entire app
+copilot pipeline init           # Create CI/CD pipeline
+copilot pipeline deploy         # Deploy pipeline
+copilot svc delete              # Delete service
+copilot env delete              # Delete environment
+copilot app delete              # Delete full app
