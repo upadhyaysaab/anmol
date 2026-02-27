@@ -141,3 +141,51 @@ Expensive
 
 Secrets (Secrets Manager)AWS Backup
 Config (SSM Parameter Store)AWS Backup
+
+
+
+🟦 Step‑by‑Step: Edit CPU & Memory
+1️⃣ Go to:
+AWS Console → ECS → Task Definitions
+2️⃣ Click your task definition
+Example:
+my-app-task
+3️⃣ Click Create new revision
+4️⃣ Scroll to Task size (Fargate only)
+Here you change:
+
+Task CPU (example: 512, 1024, 2048)
+Task Memory (example: 1024, 2048, 4096)
+
+
+🟩 For container-level CPU & memory
+Scroll to Container Definitions → (your container name)
+You will see:
+✔ CPU (shares)
+Field name: CPU units
+Example: 256
+✔ Memory (soft)
+Field name: Memory Reservation (MiB)
+Example: 256
+✔ Memory (hard limit)
+Field name: Hard limit (MiB)
+Example: 512
+Make changes as needed.
+
+🟧 After editing → Save
+Click:
+Create
+This creates Task Definition Revision N+1.
+
+🟦 Deploy the new revision
+Now update your ECS Service:
+1️⃣ Go to ECS → Clusters → Services
+2️⃣ Select your service
+3️⃣ Click Update
+4️⃣ Choose the new task definition revision
+5️⃣ Click Deploy
+ECS will:
+
+Start tasks with new CPU/memory
+Stop old tasks
+Zero-downtime deploy (rolling update)
