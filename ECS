@@ -1,0 +1,62 @@
+Cluster
+Group where ECS tasks/services run. [docs.aws.amazon.com]
+
+Task Definition
+Blueprint defining one or more containers + CPU/Mem + ports + roles. [docs.aws.amazon.com]
+
+Task
+A running instance of the task definition containing one or more containers. [docs.aws.amazon.com]
+
+Container
+The actual Docker workload running inside a task. [docs.aws.amazon.com]
+
+Service
+Maintains desired number of tasks (replicas) and handles load balancing. [docs.aws.amazon.com]
+
+Task Set
+A versioned group of tasks created during ECS Blue/Green deployments (original + replacement). [docs.aws.amazon.com]
+
+AppSpec File (appspec.yml)
+Deployment config telling CodeDeploy which Task Definition + container/port to use + optional hooks. [docs.aws.amazon.com]
+
+TargetService
+AppSpec section that points to the ECS Service + Task Definition revision. [docs.aws.amazon.com]
+
+LoadBalancerInfo
+Defines container name + port where ALB will route traffic during deployment. [docs.aws.amazon.com]
+
+Hooks
+Optional Lambda functions executed at ECS lifecycle stages (BeforeInstall → AfterAllowTraffic). [docs.aws.amazon.com]
+
+BeforeInstall
+Runs before replacement task set is created. [docs.aws.amazon.com]
+
+AfterInstall
+Runs after replacement task set is created and attached to a target group. [docs.aws.amazon.com]
+
+AfterAllowTestTraffic
+Runs after ALB test listener sends traffic to the new task set. [docs.aws.amazon.com]
+
+BeforeAllowTraffic
+Runs before production traffic shifts to new task set. [docs.aws.amazon.com]
+
+AfterAllowTraffic
+Runs after production traffic starts flowing to replacement task set. [docs.aws.amazon.com]
+
+Blue/Green Deployment
+CodeDeploy launches replacement task set → tests it → shifts traffic → terminates old one. [docs.aws.amazon.com]
+
+Traffic Shifting (CodeDeploy)
+Controls how ALB moves traffic between original and replacement task sets. [docs.aws.amazon.com]
+
+Test Listener (ALB)
+Sends traffic to replacement task set during validation stage. [docs.aws.amazon.com]
+
+Production Listener (ALB)
+Handles live traffic and shifts it to the new task set upon approval. [docs.aws.amazon.com]
+
+Revision
+In ECS deployments, the AppSpec file is considered the deployment revision. [docs.aws.amazon.com]
+
+Lambda Validation Functions
+Optional hooks that can approve/rollback deployments.
