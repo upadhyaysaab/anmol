@@ -7,6 +7,26 @@ docker run -it --name hostcont -v /home/ec2-user:/anmol --privileged=true ubuntu
 [root@ip-172-31-23-167 ec2-user]# docker tag myimage upadhyaysaab/newimg
 [root@ip-172-31-23-167 ec2-user]# docker push upadhyaysaab/newimg
 
+Enlighten, enable, and empower multidisciplinary teams by providing deep expertise in container platforms and runtime environments.
+Design, build, and operate highly available container workloads on AWS ECS and Fargate.
+Optimize container lifecycle management including image creation, hardening, scanning, deployment, and runtime performance.
+Partner with application teams to modernize workloads into container-first architectures.
+Identify, prioritize, and resolve reliability and performance issues across containerized services.
+Establish observability best practices for containers and clusters, including metrics, logging, tracing, and alerting.
+Develop and improve automation for container builds, CI/CD pipelines, and infrastructure provisioning.
+Drive improvements in container security posture, including least privilege, non-root containers, and image vulnerability management.
+Collaborate with platform and networking teams to ensure resilient service connectivity and traffic management.
+Champion operational excellence by documenting standards, mentoring peers, and promoting automation-first culture.
+In short — build, run, and scale all the containers.
+
+Here’s What You Need:
+
 Strong hands-on experience with Docker and container fundamentals.
 Mandatory experience operating workloads on AWS ECS (EC2 and/or Fargate) in production environments.
 Strong Linux administration and troubleshooting skills (process, memory, networking basics, filesystem).
+Proven experience with container image build pipelines and lifecycle management.
+Operational experience with AWS services supporting containers (ECR, ALB/NLB, IAM roles for tasks, Auto Scaling).
+Proficiency in scripting (Bash, Python, or similar) for automation and operational tooling.
+Experience integrating container workflows into CI/CD pipelines (Buildkite, Jenkins, or similar).
+Working knowledge of observability platforms such as Datadog, Dynatrace, Splunk, or Sumo Logic.
+Understanding of container security best practices and runtime hardening.
