@@ -137,3 +137,7 @@ Full APM → logs, metrics, traces, profiling
 Beautiful dashboards
 AI-based anomaly detection
 Expensive
+
+
+Secrets (Secrets Manager)AWS Backup
+Config (SSM Parameter Store)AWS Backup
