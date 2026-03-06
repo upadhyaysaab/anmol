@@ -97,3 +97,34 @@ do
 echo "go in $starts"
 let starts++
 done
+
+## FUNCTION ###
+
+#!/bin/bash
+
+
+# TO MAKE A FUNCTION
+
+function myfun {
+
+    echo "my name is anmol"
+}
+
+# TO CALL A FUNCTION
+
+myfun
+
+###PRINT FUNCTION N time"
+
+#!/bin/bash
+
+function myfun {
+
+    echo "my name is anmol"
+}
+myfun
+
+for i in {1..10}
+do
+echo myfun
+done
