@@ -1,0 +1,99 @@
+## IF ELSE ##
+
+#!/bin/bash
+
+a=2
+
+if [[ $a -gt 2 ]]
+then
+  echo "bye bye"
+else
+  echo "hi3"
+fi
+
+## ELIF ##
+
+#!/bin/bash
+
+a=2
+
+if [[ $a -eq 1 ]]
+then
+  echo "bye bye"
+
+elif [[ $a -lt 3]]
+then
+ echo "same"
+else
+  echo "hi3"
+fi
+
+## OPERATOR ## (&& both true, || one true one false)
+
+#!/bin/bash
+
+age=24
+name="anmol"
+
+if [[ $age -gt 21 ]] && [[ $name -eq anmol ]]
+then
+echo "it's correct"
+else
+echo "It's incorrect"
+fi
+
+
+#!/bin/bash
+
+age=24
+name="anmol"
+
+if [[ $age -gt 21 ]] || [[ $name -eq anuj ]]
+then
+echo "it's correct"
+else
+echo "It's incorrect"
+fi
+
+ ## LOOPS ####
+
+#!/bin/bash
+
+for i in 1 2 3 4 5 6 7 8 9
+do 
+echo "$i"
+done
+
+WILDCARD (range)
+
+#!/bin/bash
+
+for i in 1 2 3 4 5 6 7 8 9
+do 
+echo "$i"
+done
+
+
+ALERDAY PRESENT HO FILE ME
+
+#!/bin/bash
+
+FILE="/tmp/my.txt"
+
+for name in $(cat $FILE)
+do
+  echo "$name"
+done
+
+## WHILE LOOP ## (For conditions)
+
+#!/bin/bash
+
+starts=0
+end=10
+
+while [ $starts -le $end ]
+do
+echo "go in $starts"
+let starts++
+done
