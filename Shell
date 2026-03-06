@@ -128,3 +128,28 @@ for i in {1..10}
 do
 echo myfun
 done
+
+## SOME USE CASES ##
+
+#!/bin/bash
+
+
+# TO MAKE A FUNCTION
+
+function myfun ()
+{
+    a=10
+    b=10
+    
+if [[ $a -eq $b ]]
+then
+echo "Its same"
+else
+echo "Its not"
+fi
+}
+
+for i in {1..4}
+do
+myfun
+done
