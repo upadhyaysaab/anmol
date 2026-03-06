@@ -38,3 +38,8 @@ resource "aws_instance" "web" {
     Name = "web-server"
   }
 }
+
+
+
+In production we store Terraform state remotely in an S3 bucket with versioning and encryption enabled. 
+DynamoDB is used for state locking to prevent multiple users from modifying the state simultaneously.
