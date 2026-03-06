@@ -149,6 +149,20 @@ echo "Its not"
 fi
 }
 
+## ARGUMENTS ## (eg copy the files)
+
+$@ means all argument
+$# number of arguments
+
+#!/bin/bash
+
+echo "my files is - $@"
+echo "total numbner of argument - $#"
+
+for filename in "$@"
+do
+echo "$filename"
+done
 for i in {1..4}
 do
 myfun
