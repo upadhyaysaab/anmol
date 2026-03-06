@@ -1,0 +1,40 @@
+MODULE
+
+module "ec2_instance" {
+  source = "git::https://github.com/company/terraform-modules.git//ec2"
+
+  instance_type = "t2.micro"
+  ami           = "ami-123456"
+  name          = "dev-server"
+}
+
+EC2-creation (count=3)
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_instance" "web" {
+  count         = 3
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "web-server-${count.index}"
+  }
+}
+
+####EC2 (nomal count)
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_instance" "web" {
+  ami           = "ami-123456"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "web-server"
+  }
+}
