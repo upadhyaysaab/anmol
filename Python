@@ -1,0 +1,32 @@
+Simple
+
+print("100")
+
+print(f'Sum of two number {10+2}')  ('f lagana pdega)
+
+
+### VARIABLES ###
+
+name="anmol"
+print (name)
+
+## datatype chekc krne ke liye
+
+bol=False
+
+print (type(bol))
+
+
+#### LISTS #####    (multiple values)
+
+user=['Anmol','Abhi','Me']
+
+print (f'Those are users {user}')  or print(user)
+
+## Wnat toprint specific values , just do by position)
+
+print (user[2])  (it will print me )
+
+
+
+print (type(bol))
