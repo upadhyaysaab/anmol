@@ -167,3 +167,34 @@ for i in {1..4}
 do
 myfun
 done
+
+
+### ARGUMENTS ### (copy data into mulitple files)
+
+#!/bin/bash
+
+FILE="/tmp/congig.txt"
+
+# Check if at least one argument is given
+if [[ $# -eq 0 ]]; then
+    echo "Kindly add at least one file/directory"
+    exit 1
+fi
+
+# Loop through all arguments
+for file in "$@"
+do
+    echo "Copying $FILE to $file"
+
+    # Create directory if it does not exist
+    mkdir -p "$file"
+
+    # Copy the file inside the directory
+    cp "$FILE" "$file/"
+done
+
+echo "Backup completed successfully!"
+
+## DEBUGGING  ##
+
+set -x for every step 
