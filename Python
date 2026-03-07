@@ -41,8 +41,83 @@ print(user)
 
 user.remove('Me')
 
+## Delete name with position
+
+del user[3]
+print(user)
+
+## Sorting ##  (asc to desc)
+
+user=['Anmol','Abhi','Me']
+
+user.append('next')
+
+user.sort()
+print(user)
+
+
+#### DICTONARIES #### (values with key)
+
+marks={'Hindi': 80,'English': 46}
+print(marks)
+
+print(marks['Hindi'])   (specific subject)
+
+## If subjetc is not present  (use get , it will give none instaed of error)
+
+print(marks.get("Maths"))
+
+
+## IF & ELSE ####
+
+a=10
+b=30
+
+if (a+b > 45):
+    print("this is incorrect")
+else:
+    print("this is correct")
+
+### ELIF ###
+
+a=10
+b=30
+
+if (a+b == 45):
+    print("this is incorrect")
+elif (a+b < 12):
+        print(" This is fully wrong")
+else:
+    print("this is correct")
+
+
+## FOR LOOP ###
+
+
+for i in 1, 2, 3, 4:
+    print(i)
 ## Modify the list (give new name with position)
 
 user[1]="Ab"
 print(user)
 
+-----
+
+##use in sets
+names=['Anmol','Abhsihek','Meow']
+
+for i in names:
+    print(i)
+
+## use with dictonaries
+
+names={'Anmol': 25,'Abhsihek': 27,'Meow': 17}
+
+for name, age in names.items():
+    print(name "age is" age)
+
+## range ##
+
+
+for i in range(1, 10):
+print(i)
