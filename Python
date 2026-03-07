@@ -23,10 +23,26 @@ user=['Anmol','Abhi','Me']
 
 print (f'Those are users {user}')  or print(user)
 
-## Wnat toprint specific values , just do by position)
+## Want to print specific values , just do by position)
 
 print (user[2])  (it will print me )
 
 
+## To add string in list  (use append)
 
-print (type(bol))
+user=['Anmol','Abhi','Me']
+
+user.append('next')
+
+print(user)
+
+
+##For removing  (use remove)
+
+user.remove('Me')
+
+## Modify the list (give new name with position)
+
+user[1]="Ab"
+print(user)
+
