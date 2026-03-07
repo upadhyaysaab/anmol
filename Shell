@@ -198,3 +198,30 @@ echo "Backup completed successfully!"
 ## DEBUGGING  ##
 
 set -x for every step 
+
+
+## COPY FILE TO S3##
+
+#!/bin/bash
+
+# VARIABLES
+ORIGIN="/tmp/mypath"
+S3_PATH="s3://MYPATH/backup"
+DAYS=90
+
+# Check local path
+if [[ ! -d $ORIGIN ]]; then
+    echo "Local path $ORIGIN not found!"
+    exit 1
+fi
+
+# Find files older than $DAYS and process
+find "$ORIGIN" -type f -mtime +$DAYS | while read -r file; do
+    echo "Processing $file ..."
+    
+    # Compress the file
+    gzip "$file" || { echo "Failed to gzip $file"; continue; }
+    
+    # Upload to S3 and remove local .gz
+    aws s3 mv "${file}.gz" "$S3_PATH/" || { echo "Failed to move $file.gz to S3"; continue; }
+done
