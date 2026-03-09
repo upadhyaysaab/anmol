@@ -180,3 +180,24 @@ def myfun():
         print(a * b)
 
 myfun()
+
+#### File Handling ##
+
+File me addkrna , agar file nhi hai to create bhi kr dega
+ (W means override , A means add krna next line me)
+
+with open('abc.txt','w') as file:
+    file.write('This the updated one')
+
+with open('abc.txt','a') as file:
+    file.write('This is next line')
+
+### JSON Parsing ##
+
+import json
+
+json_path='{"name": "Anmol","age": "24"}'
+
+name=json.loads(json_path)
+ print(name)
+    
