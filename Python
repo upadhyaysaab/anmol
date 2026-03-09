@@ -213,3 +213,25 @@ print(name['age'])
 ## upadting the value ##
 
  name=['age'] = '23'
+
+## API with Json
+
+import requests
+import json
+
+def myval():
+    url = 'https://myjson-1234'  # replace with actual endpoint
+    data = {
+        'Name': 'Anmol',   # use colon, not =
+        'Age': 34
+    }
+
+    response = requests.post(url, json=data)
+    st = response.status_code  # get status after request
+
+    if st == 201:
+        print("It's updated")
+    else:
+        print("Not found")
+
+myval()
