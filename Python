@@ -200,4 +200,16 @@ json_path='{"name": "Anmol","age": "24"}'
 
 name=json.loads(json_path)
  print(name)
-    
+
+## via name ##
+
+import json
+
+json_path = '{"name": "Anmol","age": "24"}'
+
+name = json.loads(json_path)
+print(name['age'])
+
+## upadting the value ##
+
+ name=['age'] = '23'
