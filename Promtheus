@@ -1,0 +1,82 @@
+Step 1: kube-state-metrics running in EKS
+
+👉 It creates a pod + service
+
+Example:
+
+kubectl get svc -n monitoring
+
+Output:
+
+kube-state-metrics   ClusterIP   10.x.x.x   8080
+
+👉 This service exposes:
+
+http://kube-state-metrics:8080/metrics
+🧩 Step 2: ServiceMonitor (IMPORTANT)
+
+👉 This is the key piece you’re missing
+
+A ServiceMonitor tells Prometheus:
+
+👉 “Hey! go scrape this service”
+
+Example:
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-state-metrics
+spec:
+  selector:
+    matchLabels:
+      app: kube-state-metrics
+  endpoints:
+  - port: http
+    interval: 30s
+
+👉 Translation:
+
+Find service with label app=kube-state-metrics
+
+Hit /metrics every 30 sec
+
+🧩 Step 3: Prometheus Operator
+
+👉 This is running in your cluster (installed via Helm)
+
+It does:
+
+Watches ServiceMonitor objects
+
+Automatically updates Prometheus config
+
+👉 You DON’T manually edit prometheus.yml
+
+🧩 Step 4: Prometheus scrapes
+
+Now Prometheus knows:
+
+👉 “I need to scrape this service”
+
+So it calls:
+
+http://kube-state-metrics:8080/metrics
+
+and stores data.
+
+🔁 Full Flow in One Line
+
+👉 Service → ServiceMonitor → Prometheus Operator → Prometheus → Metrics stored
+
+🔥 Real-Life Analogy (easy)
+
+Think like this:
+
+kube-state-metrics = teacher giving data
+
+Service = classroom address
+
+ServiceMonitor = timetable
+
+Prometheus = student collecting notes
