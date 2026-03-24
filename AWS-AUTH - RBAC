@@ -1,0 +1,127 @@
+AWS EKS Authentication & RBAC Flow (Hinglish)
+1️⃣ IAM Identity (AWS Level)
+Cluster ko access karne ke liye pehle aapka IAM User ya IAM Role hona chahiye.
+Examples:
+IAM User → AWS console ya CLI user
+IAM Role → EC2 instance role, service account role, ya cross-account role
+2️⃣ aws-auth ConfigMap (EKS Level)
+Purpose: Map karta hai IAM identities ko Kubernetes username aur groups ke saath.
+Default state: sirf cluster creator aur node IAM roles ko access hota hai.
+
+Default aws-auth ConfigMap:
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::<ACCOUNT_ID>:role/<EKS_NODE_ROLE>
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+  mapUsers: |
+    - userarn: arn:aws:iam::<ACCOUNT_ID>:user/<CLUSTER_CREATOR>
+      username: admin
+      groups:
+        - system:masters
+
+Key points:
+
+mapRoles → Nodes ya IAM Roles ko Kubernetes user/groups se map karta hai
+mapUsers → IAM Users ko Kubernetes user/groups se map karta hai
+Sirf jo identities aws-auth mein hain, wahi cluster access kar sakti hain
+3️⃣ Kubernetes RBAC (Cluster Level)
+Purpose: Decide karta hai user/group kya actions kar sakte hain cluster mein.
+Resources:
+Role → ek namespace ke andar permissions
+ClusterRole → poore cluster ke liye permissions
+RoleBinding → Role ko user/group ke saath bind karta hai namespace mein
+ClusterRoleBinding → ClusterRole ko user/group ke saath bind karta hai cluster-wide
+
+Namespace-level example (Role + RoleBinding):
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: dev
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get","list","watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods-binding
+  namespace: dev
+subjects:
+- kind: User
+  name: devuser         # aws-auth mein jo username hai
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+
+Cluster-wide example (ClusterRole + ClusterRoleBinding):
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-admin-binding
+subjects:
+- kind: User
+  name: adminuser       # aws-auth username
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+4️⃣ Step-by-Step Flow
+IAM User/Role
+       │
+       ▼
+aws-auth ConfigMap  --> IAM ko Kubernetes username/group mein map karta hai
+       │
+       ▼
+Kubernetes RBAC (Role/ClusterRole + RoleBinding/ClusterRoleBinding)
+       │
+       ▼
+Allowed actions: pods, deployments, nodes, configmaps etc.
+
+Samajh lo:
+
+IAM identity request bhejti hai cluster ko → Authentication via aws-auth
+Kubernetes check karta hai aws-auth ConfigMap
+Agar identity exist karti hai → allowed
+Agar nahi → denied
+RBAC check karta hai → Kya user kya kar sakta hai (namespace ya cluster-wide)
+5️⃣ Key Notes (Interview Tips)
+Default Admin: Cluster creator IAM user → system:masters group
+Nodes: Node IAM roles → system:nodes group
+Best Practice: Least privilege → IAM → map in aws-auth → specific RBAC
+Cross-Account Access: Map external IAM roles in aws-auth → access allow
+6️⃣ Flow Diagram (Hinglish)
+        +-----------------+
+        |  IAM User/Role  |    <-- AWS Identity
+        +--------+--------+
+                 |
+                 ▼
+        +-----------------+
+        | aws-auth ConfigMap|   <-- IAM → Kubernetes username/groups
+        +--------+--------+
+                 |
+                 ▼
+        +-----------------+
+        |    Kubernetes   |
+        |      RBAC       |   <-- Role/ClusterRole + Bindings
+        +--------+--------+
+                 |
+                 ▼
+      Allowed actions in cluster
+   (pods, deployments, nodes, namespaces)
