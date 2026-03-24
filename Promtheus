@@ -136,3 +136,36 @@ ServiceMonitor = Timetable (when to collect data)
 Prometheus Operator = Coordinator telling student where to go
 Prometheus = Student collecting notes
 AlertManager = Parent/Principal gets alerted if something is wrong
+
+
+
+
+-----------------------------------------------------------
+
+1️⃣ Pod/Deployment
+Tumhare kube-state-metrics Deployment/Pod me hota hai label:
+labels:
+  app.kubernetes.io/name: kube-state-metrics
+Ye label define karta hai ki Service kaunse pods ko target karega.
+
+2️⃣ Service
+Tumhare Service me hota hai selector:
+selector:
+  app.kubernetes.io/name: kube-state-metrics
+Selector = Deployment/Pod ke labels se match karna chahiye
+Ye decide karta hai ki service metrics request ko kaunse pods me forward kare
+
+3️⃣ ServiceMonitor (Prometheus Operator ke liye)
+Tumhare ServiceMonitor ka selector:
+selector:
+  matchLabels:
+    app.kubernetes.io/name: kube-state-metrics
+Ye Service ke labels se match karna chahiye, nahi toh Prometheus service ko scrape nahi karega
+
+🔹 Flow me matching
+Pod/Deployment label
+      ↓ matches
+Service selector
+      ↓ matches
+ServiceMonitor selector
+      ↓ tells Prometheus to scrape this service
