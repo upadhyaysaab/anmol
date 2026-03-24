@@ -169,3 +169,12 @@ Service selector
       ↓ matches
 ServiceMonitor selector
       ↓ tells Prometheus to scrape this service
+
+
+
+Kube-state-metrics + ServiceMonitor + PrometheusRule
+
+Sab alerting aur metrics YAMLs alag hain:
+kube-state-metrics Deployment + Service (automatically Helm se create hota hai)
+ServiceMonitor → manually create, Prometheus ko metrics scrape karne ke liye
+PrometheusRule → manually create, microservice A/B ke thresholds define karne ke liye
