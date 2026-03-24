@@ -80,3 +80,59 @@ Service = classroom address
 ServiceMonitor = timetable
 
 Prometheus = student collecting notes
+
+
+
+------------------------------------------------------------
+
+Full Monitoring Flow in EKS (Hinglish)
+Pods run ho rahe hain cluster me
+Ye jo app ya services chal rahi hain, unke internal state aur metrics chahiye monitoring ke liye.
+Example: CPU usage, memory, pod status, deployments etc.
+kube-state-metrics / Metrics Exporter
+Ye ek pod + service create karta hai.
+Ye pod cluster state ka data /metrics endpoint pe expose karta hai.
+
+Example URL:
+
+http://kube-state-metrics:8080/metrics
+Service
+Ye kube-state-metrics pod ko cluster ke andar access karne ke liye address deta hai.
+Service ek stable IP / DNS provide karta hai, chahe pod restart ho jaye.
+ServiceMonitor (Important)
+Ye Prometheus ko batata hai ki kaunsi service ko scrape karna hai aur kitni frequency me.
+
+Example:
+
+matchLabels:
+  app: kube-state-metrics
+interval: 30s
+Matlab: /metrics endpoint ko har 30 second me scrape karo.
+Prometheus Operator
+Ye cluster me run hota hai aur ServiceMonitor objects ko watch karta hai.
+Automatically Prometheus ka config update karta hai.
+Aapko manually prometheus.yml edit nahi karna padta.
+Prometheus
+Operator ke through Prometheus ko pata chal gaya ki kya scrape karna hai.
+Prometheus /metrics call karta hai aur data store kar leta hai.
+Example: Pod CPU usage, memory usage, pod count, restarts etc.
+Alerting (Prometheus Alertmanager)
+Prometheus rules ke through thresholds set karte hain.
+Example: CPU > 80%, Pod down, Memory > 70%
+Agar condition meet hoti hai, Alertmanager notification send karta hai:
+Slack, Email, Teams, SMS, Webhook
+Visualization (Optional)
+Prometheus se data ko Grafana me visualize kar sakte ho.
+Dashboards me graphs, trends, history, alerts etc.
+One-line Full Flow (Hinglish)
+Pods → kube-state-metrics → Service → ServiceMonitor → Prometheus Operator → Prometheus → AlertManager → Metrics/Alerts
+
+💡 Real-life analogy (easy):
+
+Pods = Students working
+kube-state-metrics = Teacher giving test scores
+Service = Classroom address
+ServiceMonitor = Timetable (when to collect data)
+Prometheus Operator = Coordinator telling student where to go
+Prometheus = Student collecting notes
+AlertManager = Parent/Principal gets alerted if something is wrong
