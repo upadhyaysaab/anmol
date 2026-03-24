@@ -235,3 +235,59 @@ def myval():
         print("Not found")
 
 myval()
+
+
+## PYTHON WITH BOTO3 ###
+
+
+
+
+import requests
+import boto3
+
+ec2 = boto3.client('ec2', region_name='us-east-1')
+sns = boto3.client('sns')
+
+CURRENT_ID = "i-1234"
+BACKUP_ID = "i-123456"
+CURRENT_VOL = "vol-1234"
+MYARN = "aws-sns-1234-abc"
+
+def lambda_handler(event, context):
+    try:
+        url = "https://www.abc.com/myfile"
+        response = requests.get(url, timeout=5)
+        
+        if response.status_code == 200:
+            print("Connection ok")
+        else:
+            message = "Action Required"
+            
+            # Stop current instance
+            ec2.stop_instances(InstanceIds=[CURRENT_ID])
+            # Take snapshot
+            ec2.create_snapshot(VolumeId=CURRENT_VOL, Description="Point-in-time backup")
+            # Start backup instance
+            ec2.start_instances(InstanceIds=[BACKUP_ID])
+            # Send SNS alert
+            sns.publish(
+                TopicArn=MYARN,
+                Message=message,
+                Subject=message
+            )
+
+    except Exception as e:
+        message = "Immediate bridge needed"
+        
+        # Stop current instance
+        ec2.stop_instances(InstanceIds=[CURRENT_ID])
+        # Take snapshot
+        ec2.create_snapshot(VolumeId=CURRENT_VOL, Description="Point-in-time backup")
+        # Start backup instance
+        ec2.start_instances(InstanceIds=[BACKUP_ID])
+        # Send SNS alert
+        sns.publish(
+            TopicArn=MYARN,
+            Message=message,
+            Subject=message
+        )
