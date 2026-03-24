@@ -12,3 +12,34 @@ In Kubernetes, a node is a worker machine (physical or virtual) where pods (cont
 
 Node in Distributed Systems:
 In a distributed system, nodes are the individual components (clients, servers, peers) that interact with each other to accomplish a task. 
+
+---------------------------------------------------------------------------------------
+
+Why EBS / Volume issues are common
+Root volume full: Logs / temp files / applications filled disk → OS cannot boot
+File system corruption: Improper shutdown, snapshot restore issues, or write failures
+Volume attachment issues: Wrong device name / leftover mounts → boot fails
+High I/O / heavy utilization during boot: For example, if cloud-init downloads too many packages on small volume
+
+So yes, in practice, high volume utilization / full root disk + file system corruption is the #1 reason Linux EC2 doesn’t start.
+
+3️⃣ How to quickly check if volume is the problem
+Get system log from console:
+Look for messages like No space left on device, ext4-fs error, kernel panic
+
+Detach & mount volume on another instance:
+
+Check disk usage:
+df -h /mnt/recovery
+Check filesystem integrity:
+sudo fsck /dev/xvdf1
+Clean up / repair → reattach → try boot
+
+💡 TL;DR:
+
+High volume usage / corrupted root volume = most common Linux EC2 startup failure
+Others: cloud-init failure, bad AMI, AWS infra issues, but less frequent
+
+If you want, I can make a step-by-step recovery checklist for EC2 not starting due to root volume issues, so you know exactly what to do first → last.
+
+Do you want me to do that?
