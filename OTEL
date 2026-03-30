@@ -1,0 +1,47 @@
+🚀 Step 1: App me OTEL SDK add karo
+Apne microservice / app me OpenTelemetry SDK add karo
+Har request ke liye span / trace generate hota hai
+env:
+  - name: OTEL_EXPORTER_OTLP_ENDPOINT
+    value: "http://otel-collector:4317"
+Matlab: app bata raha hai “bhai traces OTEL Collector ko bhej do”
+🚀 Step 2: OTEL Collector EKS me deploy karo
+Collector ka kaam = receive traces → forward to backend (Tempo)
+helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+helm repo update
+helm install otel-collector open-telemetry/opentelemetry-collector --set mode=daemonset
+Collector config snippet:
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  tempo:
+    endpoint: "tempo.tempo.svc.cluster.local:4317"
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [tempo]
+Receiver → kahan se traces aayenge
+Exporter → kahan bhejna hai (Tempo)
+Pipeline → receiver → exporter ka connection
+🚀 Step 3: Deploy Tempo + Grafana
+Tempo = traces ka storage
+Grafana → add Tempo datasource
+Dashboard me service maps, latency, error traces dekh sakte ho
+🚀 Step 4: Dashboard me traces dekho
+Service map → kaunsa service slow hai
+Latency histogram → request kitni der me complete hui
+Error traces → kaunsa request fail hua
+Optional: metrics nikal ke Prometheus me bhej do → alerts
+🚀 Step 5: End-to-end Flow
+User Request → App Pod (OTEL SDK) → OTEL Collector → Tempo → Grafana Dashboard
+Traces visualize → bottlenecks + slow requests
+Metrics & alerts → optional, Prometheus + Grafana
+🧠 Interview Hinglish line
+
+“EKS me app ko OpenTelemetry SDK se instrument karte hain, jo traces generate karta hai. Ye traces OTEL Collector ko jaate hain, wahan se Grafana Tempo me store hote hain aur Grafana dashboard me service map, latency aur errors dikhte hain. Metrics derive karke alerts bhi set kar sakte hain.”
