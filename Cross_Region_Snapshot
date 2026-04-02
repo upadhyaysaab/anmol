@@ -1,0 +1,34 @@
+import boto3
+
+# Source and destination regions
+source_region = 'us-east-2'   # Ohio
+dest_region = 'ap-south-1'    # Mumbai
+
+# Volume to snapshot
+volume_id = 'vol-1234'
+
+# Create EC2 clients
+ec2_source = boto3.client('ec2', region_name=source_region)
+ec2_dest = boto3.client('ec2', region_name=dest_region)
+
+# Step 1: Create snapshot in Ohio
+snapshot = ec2_source.create_snapshot(
+    VolumeId=volume_id,
+    Description='Cross-region backup'
+)
+snapshot_id = snapshot['SnapshotId']
+print(f"Snapshot created in Ohio: {snapshot_id}")
+
+# Wait for snapshot to complete
+waiter = ec2_source.get_waiter('snapshot_completed')
+waiter.wait(SnapshotIds=[snapshot_id])
+print("Snapshot completed in Ohio!")
+
+# Step 2: Copy snapshot to Mumbai
+copy_snapshot = ec2_dest.copy_snapshot(
+    SourceRegion=source_region,
+    SourceSnapshotId=snapshot_id,
+    Description='Copied to Mumbai DR'
+)
+copy_snapshot_id = copy_snapshot['SnapshotId']
+print(f"Snapshot copied to Mumbai: {copy_snapshot_id}")
