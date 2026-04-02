@@ -291,3 +291,75 @@ def lambda_handler(event, context):
             Message=message,
             Subject=message
         )
+
+--------------------------------------------
+
+import requests
+import boto3
+import logging
+import sys
+
+# -------- LOGGER SETUP --------
+logging.basicConfig(level=logging.INFO) 
+ logger = logging.getLogger()
+
+# -------- AWS CLIENTS --------
+ec2 = boto3.client('ec2', region_name='us-east-1')
+sns = boto3.client('sns')
+
+CURRENT_ID = "i-1234"
+BACKUP_ID = "i-5678"
+CURRENT_VOL = "vol-1234"
+MYARN = "aws-sns-arn"
+
+# -------- MAIN LOGIC --------
+def lambda_handler(event, context):
+    url = "https://www.abc.com/myfile"
+
+    try:
+        logger.info(f"Checking API health: {url}")
+
+        response = requests.get(url, timeout=5)
+
+        logger.info(f"API status code: {response.status_code}")
+
+        if response.status_code == 200:
+            logger.info("API is healthy ✅")
+
+        else:
+            logger.warning("API unhealthy ⚠️ - triggering failover")
+            failover("API returned non-200 response")
+
+    except Exception as e:
+        logger.error(f"API check failed: {e}")
+        failover("Exception occurred during API check")
+
+
+# -------- FAILOVER FUNCTION --------
+def failover(reason):
+    try:
+        logger.error(f"FAILOVER INITIATED 🚨 Reason: {reason}")
+
+        logger.info(f"Stopping current instance: {CURRENT_ID}")
+        ec2.stop_instances(InstanceIds=[CURRENT_ID])
+
+        logger.info(f"Creating snapshot: {CURRENT_VOL}")
+        ec2.create_snapshot(
+            VolumeId=CURRENT_VOL,
+            Description="Auto backup before failover"
+        )
+
+        logger.info(f"Starting backup instance: {BACKUP_ID}")
+        ec2.start_instances(InstanceIds=[BACKUP_ID])
+
+        logger.info("Sending SNS alert")
+        sns.publish(
+            TopicArn=MYARN,
+            Message=reason,
+            Subject="Failover Triggered"
+        )
+
+        logger.info("Failover completed successfully ✅")
+
+    except Exception as e:
+        logger.critical(f"FAILOVER FAILED 💀: {e}")
