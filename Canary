@@ -1,0 +1,123 @@
+We are using:
+👉 Argo Rollouts + Istio
+
+🧠 Scene kya hai?
+
+Tumhare paas:
+
+myapp:v1 → current stable version
+myapp:latest → new version (canary)
+
+Goal:
+👉 Naya version dhire-dhire release karna hai safely, bina sab users ko risk diye
+
+🔹 Step 1: Istio kya karega?
+
+Istio ka kaam simple hai:
+
+👉 Traffic ko control karna
+
+2 cheeze define karte hain:
+1. DestinationRule
+
+Yeh batata hai kaun kaun se versions hain:
+
+stable → v1
+canary → latest
+2. VirtualService
+
+Yeh decide karta hai traffic kaha jayega:
+
+Start mein:
+
+100% → v1
+0% → latest
+
+👉 Matlab abhi new version kisi ko nahi dikhega
+
+🔹 Step 2: Argo Rollouts kya karega?
+
+👉 Yeh Deployment ko replace karta hai
+
+Iska kaam:
+
+rollout steps control karna
+traffic percentage badhana
+pause lena
+failure pe rollback
+🔥 Real Flow (Step by Step)
+🚀 Step 0: Deployment start
+
+Tumne myapp:latest deploy kiya
+
+👉 Argo new pods create karega
+
+📊 Step 1: 10% traffic
+
+Argo bolega:
+
+👉 “Istio, 10% traffic latest ko bhejo”
+
+Now:
+
+90% → v1
+10% → latest
+⏸ Step 2: Pause (2 min)
+
+System rukega
+
+Tum check karoge:
+
+errors aa rahe hain?
+latency badh rahi hai?
+users complain kar rahe hain?
+📈 Step 3: 30% traffic
+
+Sab sahi → Argo next step
+
+70% → v1
+30% → latest
+📈 Step 4: 50% → 100%
+
+Gradually pura traffic shift ho jayega
+
+🔴 Agar problem aayi toh?
+
+Example:
+
+payment fail hone lage
+API error spike
+
+👉 Argo automatically karega:
+
+traffic wapas 100% v1 pe
+rollout stop
+
+💥 No downtime, safe rollback
+
+🔥 Simple Language mein Samjho
+Argo = manager 👨‍💼
+→ decide karta hai “kitna traffic shift karna hai”
+Istio = traffic police 🚦
+→ actual mein traffic route karta hai
+🧠 Real Production Insight
+
+Banking / fintech mein:
+
+direct 100% deploy ❌ kabhi nahi
+always gradual rollout ✔
+monitoring mandatory ✔
+rollback automatic ✔
+⚠️ Common mistake (interview trap)
+
+Mat bolna:
+
+❌ “Argo traffic bhejta hai”
+
+Sahi:
+
+✔ “Argo Istio ko instruct karta hai, aur Istio traffic route karta hai”
+
+🎯 Short Interview Answer (Hinglish)
+
+“Argo Rollouts rollout steps control karta hai jaise 10%, 30%, 50% traffic shift, aur Istio VirtualService ke through actual traffic routing hoti hai. Agar metrics me issue aata hai toh Argo automatically rollback kar deta hai.”
