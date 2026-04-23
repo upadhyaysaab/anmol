@@ -1,0 +1,124 @@
+Chalo bhai, EFS (Elastic File System) ko EKS pe persistent storage ke liye setup karte hain step-by-step in Hinglish, real DevOps style 🚀
+
+🧠 Concept samajh le pehle
+Amazon EKS = managed Kubernetes
+Amazon EFS = shared storage (NFS based)
+
+👉 EFS = multiple pods across nodes ek hi storage share kar sakte hain
+👉 Perfect for: logs, shared files, CMS, ML workloads
+
+🔥 Step-by-Step Setup
+🔹 1. EFS Create karo
+AWS Console → EFS → Create
+Important config:
+VPC = same as EKS
+Subnets = all AZs (high availability)
+Security Group:
+Allow inbound NFS (2049) from EKS nodes SG
+🔹 2. IAM Role (IRSA) setup
+
+👉 EKS ko permission chahiye EFS access karne ke liye
+
+Create IAM policy:
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "elasticfilesystem:DescribeAccessPoints",
+        "elasticfilesystem:DescribeFileSystems"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+
+👉 Attach this to Service Account using IRSA
+
+🔹 3. EFS CSI Driver install karo
+
+👉 Ye driver EKS ko EFS mount karne deta hai
+
+kubectl apply -k "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable"
+
+👉 Verify:
+
+kubectl get pods -n kube-system
+🔹 4. StorageClass create karo
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: efs-sc
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: <EFS-ID>
+  directoryPerms: "700"
+
+Apply:
+
+kubectl apply -f sc.yaml
+🔹 5. PersistentVolumeClaim (PVC)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: efs-pvc
+spec:
+  accessModes:
+    - ReadWriteMany     # 🔥 multi pod access
+  storageClassName: efs-sc
+  resources:
+    requests:
+      storage: 5Gi
+
+Apply:
+
+kubectl apply -f pvc.yaml
+🔹 6. Pod / Deployment use karo
+apiVersion: v1
+kind: Pod
+metadata:
+  name: efs-app
+spec:
+  containers:
+  - name: app
+    image: nginx
+    volumeMounts:
+    - mountPath: /data
+      name: efs-volume
+  volumes:
+  - name: efs-volume
+    persistentVolumeClaim:
+      claimName: efs-pvc
+
+👉 /data = shared storage (same across pods)
+
+🔥 Real Production Flow
+Pod A writes file → /data/file.txt
+Pod B (different node) reads same file ✅
+👉 That’s power of EFS (RWX mode)
+⚠️ Common Issues (Interview Gold 💣)
+❌ 1. Pod stuck in Pending
+
+👉 Check:
+
+kubectl describe pvc
+❌ 2. Mount failed
+
+👉 Check:
+
+Security group (port 2049 open?)
+EFS in same VPC?
+❌ 3. Permission issue
+
+👉 Fix:
+
+directoryPerms: "777"
+🧠 Easy Memory Trick
+EBS → single pod (RWO)
+EFS → multiple pods (RWX) 🔥
+🚀 Real Interview Line
+
+👉 “In production EKS, we use EFS with CSI driver and RWX PVC to enable shared storage across pods for stateful workloads.”
