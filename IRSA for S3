@@ -1,0 +1,76 @@
+🧠 IRSA FULL WORKFLOW (EKS + S3) – Hinglish Notes
+🎯 Use Case
+Pod A → S3 access ✅
+Pod B → S3 access ✅
+Pod C → No access ❌
+🔥 Step 1: OIDC Provider enable
+
+👉 Amazon EKS ko IAM se connect karte hain
+
+eksctl utils associate-iam-oidc-provider \
+  --cluster my-cluster \
+  --approve
+
+👉 Ye trust establish karta hai between EKS & AWS IAM
+
+🔥 Step 2: IAM Policy (S3 access)
+
+👉 Amazon S3 ke liye permissions
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::my-bucket/*"
+    }
+  ]
+}
+🔥 Step 3: IAM Role (IRSA Role)
+
+👉 Is role ko upar wali policy attach karte hain
+
+🔑 Trust Policy (important)
+OIDC provider use hota hai
+Specific service account restrict hota hai
+
+👉 Key line:
+
+system:serviceaccount:<namespace>:s3-access-sa
+🔥 Step 4: Kubernetes Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: s3-access-sa
+  namespace: default
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/s3-access-role
+
+👉 Ye bridge hai pod ↔ IAM role
+
+🔥 Step 5: Pod Configuration
+✅ Pod A & B (S3 access)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-a
+spec:
+  serviceAccountName: s3-access-sa
+  containers:
+  - name: app
+    image: amazonlinux
+
+👉 Pod B same config use karega
+
+❌ Pod C (No access)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-c
+spec:
+  containers:
+  - name: app
+    image: amazonlinux
+
+👉 Default service account → no IAM role → no S3 access
