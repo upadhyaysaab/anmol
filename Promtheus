@@ -194,3 +194,6 @@ Prometheus scrapes metrics
 Alert rules evaluated
         ↓
 Alertmanager sends notification
+
+
+Pod → /metrics → Service → ServiceMonitor → Prometheus → Alert Rule → Alertmanager → Slack/Email
