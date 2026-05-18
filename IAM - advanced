@@ -1,0 +1,37 @@
+Advanced 3+ Years IAM Questions
+21. What are SCPs in AWS Organizations?
+
+SCP (Service Control Policy) organization level pe maximum permissions define karti hai.
+
+Even admin user bhi SCP restrictions bypass nahi kar sakta.
+
+22. What are Permission Boundaries?
+
+Maximum permissions limit define karti hain for IAM users/roles.
+
+Delegated administration me useful.
+
+23. Explain policy evaluation logic.
+
+AWS evaluate karta hai:
+
+SCP
+Permission boundaries
+Session policies
+Identity policies
+Resource policies
+
+Final decision:
+
+Explicit deny → deny
+Allow required from applicable policies
+24. Difference between AWS managed and Customer managed policies?
+
+AWS Managed:
+
+AWS maintain karta hai
+
+Customer Managed:
+
+Hum create/manage karte hain
+More customization
