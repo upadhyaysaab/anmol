@@ -1,0 +1,24 @@
+git rebase main
+
+# conflict aya
+
+# file edit karo
+# symbols hatao
+
+git add .
+
+git rebase --continue
+
+
+Example:
+
+<<<<<<< HEAD
+Hello Anmol
+=======
+Hello AWS
+>>>>>>> feature
+
+Agar tum bas symbols hata do:
+
+Hello Anmol
+Hello AWS
