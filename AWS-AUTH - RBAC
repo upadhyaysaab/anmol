@@ -125,3 +125,15 @@ Cross-Account Access: Map external IAM roles in aws-auth → access allow
                  ▼
       Allowed actions in cluster
    (pods, deployments, nodes, namespaces)
+
+
+
+
+
+EKS IAM me ek OIDC identity provider create karta hai. IAM roles us OIDC provider par trust set karte hain using 
+AssumeRoleWithWebIdentity.
+
+Kubernetes ServiceAccounts ko IAM roles ke saath map kiya jata hai annotations ke through.
+
+Jab pod run hota hai, to usko ek OIDC token milta hai, aur us token ke through woh STS (Security Token Service) 
+use karke IAM role assume karta hai, bina kisi access key ke.
