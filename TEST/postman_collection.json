@@ -1,0 +1,15 @@
+{
+  "info": {
+    "name": "TEST API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET /hello",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/hello"
+      }
+    }
+  ]
+}
