@@ -3,9 +3,12 @@ node {
     def appName = "test-app"
     def imageTag = "latest"
 
-    stage('Checkout') {
-        checkout scm
+  stage('Checkout') {
+    steps {
+        git url: 'https://github.com/upadhyaysaab/anmol.git',
+            branch: 'main'
     }
+}
 
     stage('Build') {
         sh 'mvn clean package'
@@ -35,11 +38,11 @@ node {
     }
 
     stage('Docker Build') {
-        sh "docker build -t ${appName}:${imageTag} ."
+        sh "docker build -t httpd:latest ."
     }
 
     stage('Run Container') {
-        sh "docker run -d -p 8080:8080 --name ${appName} ${appName}:${imageTag}"
+        sh "docker run -d -p 8080:8080 --name mycontainer httpd:latest"
         sleep 10
     }
 
