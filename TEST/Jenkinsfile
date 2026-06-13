@@ -1,0 +1,74 @@
+node {
+
+    def appName = "test-app"
+    def imageTag = "latest"
+
+    stage('Checkout') {
+        checkout scm
+    }
+
+    stage('Build') {
+        sh 'mvn clean package'
+    }
+
+    stage('Unit Test') {
+        sh 'mvn test'
+    }
+
+    stage('JaCoCo Report') {
+        sh 'mvn jacoco:report'
+    }
+
+    stage('SonarQube Analysis') {
+        sh """
+        mvn sonar:sonar \
+        -Dsonar.host.url=http://localhost:9000 \
+        -Dsonar.login=admin \
+        -Dsonar.password=admin
+        """
+    }
+
+    stage('Quality Gate') {
+        timeout(time: 2, unit: 'MINUTES') {
+            waitForQualityGate abortPipeline: true
+        }
+    }
+
+    stage('Docker Build') {
+        sh "docker build -t ${appName}:${imageTag} ."
+    }
+
+    stage('Run Container') {
+        sh "docker run -d -p 8080:8080 --name ${appName} ${appName}:${imageTag}"
+        sleep 10
+    }
+
+    stage('Integration Test - Newman') {
+        sh """
+        newman run postman_collection.json \
+        --reporters cli,html \
+        --reporter-html-export newman-report.html
+        """
+    }
+
+    stage('Trivy Scan') {
+        sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${appName}:${imageTag}"
+    }
+
+    stage('Cleanup') {
+        sh """
+        docker stop ${appName} || true
+        docker rm ${appName} || true
+        """
+    }
+
+    stage('Archive Reports') {
+        archiveArtifacts artifacts: 'newman-report.html', fingerprint: true
+    }
+
+    post {
+        always {
+            junit '**/target/surefire-reports/*.xml'
+        }
+    }
+}
