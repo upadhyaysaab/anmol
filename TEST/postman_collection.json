@@ -9,13 +9,12 @@
       "name": "Hello",
       "request": {
         "method": "GET",
+        "header": [],
         "url": {
-          "raw": "http://localhost:8080/hello",
-          "protocol": "http",
+          "raw": "{{baseUrl}}/hello",
           "host": [
-            "localhost"
+            "{{baseUrl}}"
           ],
-          "port": "8080",
           "path": [
             "hello"
           ]
