@@ -87,7 +87,6 @@ node {
 
 stage('Integration Test - Newman') {
     sh '''
-    cd TEST
     newman run postman_collection.json \
     --env-var baseUrl=http://35.154.214.184:8081 \
     --reporters cli,html \
