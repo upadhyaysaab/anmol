@@ -70,7 +70,7 @@ node {
             stage('Run Container') {
                 sh """
                 docker rm -f ${appName} || true
-                docker run -d -p 8080:8080 --name ${appName} ${appName}:${imageTag}
+                docker run -d -p 8081:8080 --name ${appName} ${appName}:${imageTag}
                 """
                 sleep 10
             }
