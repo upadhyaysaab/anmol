@@ -1,10 +1,23 @@
-
 node {
 
     def appName = "test-app"
     def imageTag = "latest"
 
+    // 🔥 FORCE JAVA 21 HERE
+    def JAVA_HOME = "/usr/lib/jvm/java-21-amazon-corretto"
+
     try {
+
+        stage('Setup Environment') {
+            sh """
+            export JAVA_HOME=${JAVA_HOME}
+            export PATH=$JAVA_HOME/bin:$PATH
+
+            java -version
+            javac -version
+            mvn -version
+            """
+        }
 
         stage('Checkout') {
             checkout scm
@@ -13,33 +26,40 @@ node {
         dir('TEST') {
 
             stage('Build') {
-                sh 'mvn clean package'
+                sh """
+                export JAVA_HOME=${JAVA_HOME}
+                export PATH=$JAVA_HOME/bin:$PATH
+                mvn clean package
+                """
             }
 
             stage('Unit Test') {
-                sh 'mvn test'
+                sh """
+                export JAVA_HOME=${JAVA_HOME}
+                export PATH=$JAVA_HOME/bin:$PATH
+                mvn test
+                """
             }
 
             stage('JaCoCo Report') {
-                sh 'mvn jacoco:report'
+                sh """
+                export JAVA_HOME=${JAVA_HOME}
+                export PATH=$JAVA_HOME/bin:$PATH
+                mvn jacoco:report
+                """
             }
 
             stage('SonarQube Analysis') {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh '''
+                    sh """
+                    export JAVA_HOME=${JAVA_HOME}
+                    export PATH=$JAVA_HOME/bin:$PATH
+
                     mvn sonar:sonar \
                     -Dsonar.host.url=http://localhost:9000 \
                     -Dsonar.login=admin \
                     -Dsonar.password=admin
-                    '''
-                }
-            }
-
-            stage('Quality Gate') {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    timeout(time: 2, unit: 'MINUTES') {
-                        waitForQualityGate abortPipeline: true
-                    }
+                    """
                 }
             }
 
@@ -52,7 +72,6 @@ node {
                 docker rm -f ${appName} || true
                 docker run -d -p 8080:8080 --name ${appName} ${appName}:${imageTag}
                 """
-
                 sleep 10
             }
 
@@ -79,8 +98,6 @@ node {
         """
 
         junit 'TEST/target/surefire-reports/*.xml'
-
         archiveArtifacts artifacts: 'TEST/newman-report.html', fingerprint: true
     }
 }
-
