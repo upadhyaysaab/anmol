@@ -86,12 +86,12 @@ node {
 }
 
 stage('Integration Test - Newman') {
-    sh """
-    newman run postman/postman_collection.json \
+    sh '''
+    newman run TEST/postman_collection.json \
     --env-var baseUrl=http://35.154.214.184:8081 \
     --reporters cli,html \
-    --reporter-html-export newman-report.html
-    """
+    --reporter-html-export TEST/newman-report.html
+    '''
 }
             stage('Trivy Scan') {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
