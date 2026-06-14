@@ -1,82 +1,86 @@
+```groovy
 node {
 
     def appName = "test-app"
     def imageTag = "latest"
 
-    stage('Checkout') {
-        checkout scm
-    }
+    try {
 
-    stage('Build') {
-        sh 'mvn clean package'
-    }
-
-    stage('Unit Test') {
-        sh 'mvn test'
-    }
-
-    stage('JaCoCo Report') {
-        sh 'mvn jacoco:report'
-    }
-
-    stage('SonarQube Analysis') {
-    steps {
-        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            sh """
-            mvn sonar:sonar \
-            -Dsonar.host.url=http://localhost:9000 \
-            -Dsonar.login=admin \
-            -Dsonar.password=admin
-            """
+        stage('Checkout') {
+            checkout scm
         }
-    }
-}
 
-stage('Quality Gate') {
-    steps {
-        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-            timeout(time: 2, unit: 'MINUTES') {
-                waitForQualityGate abortPipeline: true
+        dir('TEST') {
+
+            stage('Build') {
+                sh 'mvn clean package'
+            }
+
+            stage('Unit Test') {
+                sh 'mvn test'
+            }
+
+            stage('JaCoCo Report') {
+                sh 'mvn jacoco:report'
+            }
+
+            stage('SonarQube Analysis') {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh '''
+                    mvn sonar:sonar \
+                    -Dsonar.host.url=http://localhost:9000 \
+                    -Dsonar.login=admin \
+                    -Dsonar.password=admin
+                    '''
+                }
+            }
+
+            stage('Quality Gate') {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    timeout(time: 2, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: true
+                    }
+                }
+            }
+
+            stage('Docker Build') {
+                sh "docker build -t ${appName}:${imageTag} ."
+            }
+
+            stage('Run Container') {
+                sh """
+                docker rm -f ${appName} || true
+                docker run -d -p 8080:8080 --name ${appName} ${appName}:${imageTag}
+                """
+
+                sleep 10
+            }
+
+            stage('Integration Test - Newman') {
+                sh '''
+                newman run postman_collection.json \
+                --reporters cli,html \
+                --reporter-html-export newman-report.html
+                '''
+            }
+
+            stage('Trivy Scan') {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${appName}:${imageTag}"
+                }
             }
         }
-    }
-}
 
-    stage('Docker Build') {
-        sh "docker build -t ${appName}:${imageTag} ."
-    }
+    } finally {
 
-    stage('Run Container') {
-        sh "docker run -d -p 8080:8080 --name ${appName} ${appName}:${imageTag}"
-        sleep 10
-    }
-
-    stage('Integration Test - Newman') {
-        sh """
-        newman run postman_collection.json \
-        --reporters cli,html \
-        --reporter-html-export newman-report.html
-        """
-    }
-
-    stage('Trivy Scan') {
-        sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${appName}:${imageTag}"
-    }
-
-    stage('Cleanup') {
         sh """
         docker stop ${appName} || true
         docker rm ${appName} || true
         """
-    }
 
-    stage('Archive Reports') {
-        archiveArtifacts artifacts: 'newman-report.html', fingerprint: true
-    }
+        junit 'TEST/target/surefire-reports/*.xml'
 
-    post {
-        always {
-            junit '**/target/surefire-reports/*.xml'
-        }
+        archiveArtifacts artifacts: 'TEST/newman-report.html', fingerprint: true
     }
 }
+```
