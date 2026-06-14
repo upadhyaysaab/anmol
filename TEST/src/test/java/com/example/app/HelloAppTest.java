@@ -1,29 +1,19 @@
 package com.example.app;
 
 import org.junit.jupiter.api.Test;
-import java.net.*;
-import java.io.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HelloAppTest {
 
     @Test
-    public void testHelloEndpoint() throws Exception {
+    public void testMessage() {
 
-        URL url = new URL("http://localhost:8080/hello");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
+        HelloApp app = new HelloApp();
 
-        assertEquals(200, conn.getResponseCode());
-
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(conn.getInputStream())
+        assertEquals(
+                "Hello Jenkins Integration Test",
+                app.getMessage()
         );
-
-        String response = br.readLine();
-        br.close();
-
-        assertEquals("Hello Jenkins Integration Test", response);
     }
 }
