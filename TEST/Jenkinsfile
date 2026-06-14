@@ -1,4 +1,4 @@
-```groovy
+
 node {
 
     def appName = "test-app"
@@ -83,4 +83,4 @@ node {
         archiveArtifacts artifacts: 'TEST/newman-report.html', fingerprint: true
     }
 }
-```
+
