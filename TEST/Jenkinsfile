@@ -123,8 +123,8 @@ node {
                 sh """
                 echo "Deploying to Kubernetes..."
 
-                kubectl apply -f deployment.yaml
-                kubectl apply -f service.yaml
+                kubectl apply -f deployment.yml
+                kubectl apply -f Service.yml
 
                 echo "Checking pods..."
                 kubectl get pods -o wide
