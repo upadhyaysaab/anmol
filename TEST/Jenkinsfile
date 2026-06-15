@@ -102,10 +102,7 @@ stage('Integration Test - Newman') {
 
     } finally {
 
-        sh """
-        docker stop ${appName} || true
-        docker rm ${appName} || true
-        """
+    
 
         junit 'TEST/target/surefire-reports/*.xml'
         archiveArtifacts artifacts: 'TEST/newman-report.html', fingerprint: true
