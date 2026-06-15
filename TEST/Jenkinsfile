@@ -101,7 +101,7 @@ node {
                 sh """
                 echo "Logging into ECR..."
 
-                aws ecr get-login-password --region ap-south-1 \
+                aws ecr get-login-password --region us-east-1 \
                 | docker login --username AWS --password-stdin 933858446728.dkr.ecr.ap-south-1.amazonaws.com
 
                 echo "Tagging image..."
