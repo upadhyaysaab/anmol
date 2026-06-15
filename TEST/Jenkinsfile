@@ -58,7 +58,7 @@ node {
                     mvn sonar:sonar \
                     -Dsonar.host.url=http://3.94.203.126:9000 \
                     -Dsonar.login=admin \
-                    -Dsonar.password=admin
+                    -Dsonar.password=Avengers6@
                     """
                 }
             }
