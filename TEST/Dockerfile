@@ -2,8 +2,12 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY target/*.jar app.jar
+# Copy the built JAR into the container
+COPY target/TEST-1.0-SNAPSHOT.jar app.jar
 
+# Expose the application port
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Using ENTRYPOINT + CMD allows easier argument overriding if needed
+ENTRYPOINT ["java", "-cp", "app.jar"]
+CMD ["com.example.app.HelloApp"]
