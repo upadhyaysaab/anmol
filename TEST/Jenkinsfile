@@ -102,16 +102,16 @@ node {
                 echo "Logging into ECR..."
 
                 aws ecr get-login-password --region us-east-1 \
-                | docker login --username AWS --password-stdin 933858446728.dkr.ecr.ap-south-1.amazonaws.com
+                | docker login --username AWS --password-stdin 933858446728.dkr.ecr.us-east-1.amazonaws.com
 
                 echo "Tagging image..."
 
                 docker tag ${appName}:${imageTag} \
-                933858446728.dkr.ecr.ap-south-1.amazonaws.com/mine/repp:${imageTag}
+                933858446728.dkr.ecr.us-east-1.amazonaws.com/mine/repp:${imageTag}
 
                 echo "Pushing image..."
 
-                docker push 933858446728.dkr.ecr.ap-south-1.amazonaws.com/mine/repp:${imageTag}
+                docker push 933858446728.dkr.ecr.us-east-1.amazonaws.com/mine/repp:${imageTag}
                 """
             }
         }
