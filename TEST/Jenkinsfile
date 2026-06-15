@@ -115,3 +115,30 @@ stage('Integration Test - Newman') {
         archiveArtifacts artifacts: 'TEST/newman-report.html', fingerprint: true
     }
 }
+
+stage('Push to ECR') {
+    environment {
+        AWS_REGION = "ap-south-1"
+        AWS_ACCOUNT_ID = "933858446728"
+        ECR_REPO = "mine/repp"
+        IMAGE_TAG = "latest"
+    }
+
+    steps {
+        sh """
+        echo "Logging into ECR..."
+
+        aws ecr get-login-password --region $AWS_REGION \
+        | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+        echo "Tagging image..."
+
+        docker tag test-app:$IMAGE_TAG \
+        $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+
+        echo "Pushing image..."
+
+        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+        """
+    }
+}
