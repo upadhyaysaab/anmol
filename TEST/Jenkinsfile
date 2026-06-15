@@ -115,6 +115,17 @@ node {
                 """
             }
 
+            stage('Set KIND Kubeconfig') {
+    sh """
+    export KUBECONFIG=$HOME/.kube/config
+
+    kind export kubeconfig --name dev-cluster
+
+    kubectl config current-context
+    kubectl cluster-info
+    """
+}
+
             // ============================
             // 🚀 KIND DEPLOY STAGE ADDED
             // ============================
