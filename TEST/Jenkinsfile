@@ -107,8 +107,7 @@ node {
 
                 echo "Tagging image..."
 
-                docker tag ${appName}:${imageTag} \
-                ${ECR_REPO}:${imageTag}
+                docker tag ${appName}:${imageTag} ${ECR_REPO}:${imageTag}
 
                 echo "Pushing image..."
 
@@ -116,23 +115,21 @@ node {
                 """
             }
 
-            # ============================
-            # 🚀 NEW STAGE: KIND DEPLOY
-            # ============================
+            // ============================
+            // 🚀 KIND DEPLOY STAGE ADDED
+            // ============================
 
             stage('Deploy to KIND') {
-                
-    sh """
-    echo "Deploying application to Kubernetes..."
+                sh """
+                echo "Deploying to Kubernetes..."
 
-    kubectl apply -f deployment.yaml
-    kubectl apply -f service.yaml
+                kubectl apply -f deployment.yaml
+                kubectl apply -f service.yaml
 
-    echo "Checking status..."
-    kubectl get pods -o wide
-    kubectl get svc
-    """
-}
+                echo "Checking pods..."
+                kubectl get pods -o wide
+                kubectl get svc
+                """
             }
         }
 
