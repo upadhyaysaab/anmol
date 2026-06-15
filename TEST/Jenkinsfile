@@ -13,6 +13,7 @@ node {
             export PATH=$JAVA_HOME/bin:$PATH
 
             java -version
+            javac -version
             mvn -version
             """
         }
@@ -24,20 +25,35 @@ node {
         dir('TEST') {
 
             stage('Build') {
-                sh "mvn clean package"
+                sh """
+                export JAVA_HOME=${JAVA_HOME}
+                export PATH=$JAVA_HOME/bin:$PATH
+                mvn clean package
+                """
             }
 
             stage('Unit Test') {
-                sh "mvn test"
+                sh """
+                export JAVA_HOME=${JAVA_HOME}
+                export PATH=$JAVA_HOME/bin:$PATH
+                mvn test
+                """
             }
 
             stage('JaCoCo Report') {
-                sh "mvn jacoco:report"
+                sh """
+                export JAVA_HOME=${JAVA_HOME}
+                export PATH=$JAVA_HOME/bin:$PATH
+                mvn jacoco:report
+                """
             }
 
             stage('SonarQube Analysis') {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     sh """
+                    export JAVA_HOME=${JAVA_HOME}
+                    export PATH=$JAVA_HOME/bin:$PATH
+
                     mvn sonar:sonar \
                     -Dsonar.host.url=http://3.94.203.126:9000 \
                     -Dsonar.login=admin \
@@ -84,37 +100,18 @@ node {
 
             stage('Push to ECR') {
                 sh """
+                echo "Logging into ECR..."
+
                 aws ecr get-login-password --region us-east-1 \
                 | docker login --username AWS --password-stdin ${ECR_REPO}
 
+                echo "Tagging image..."
+
                 docker tag ${appName}:${imageTag} ${ECR_REPO}:${imageTag}
+
+                echo "Pushing image..."
+
                 docker push ${ECR_REPO}:${imageTag}
-                """
-            }
-
-            // ============================
-            // 🚀 KIND SETUP (SAFE VERSION)
-            // ============================
-
-            stage('KIND Setup Kubeconfig') {
-                sh """
-                kind export kubeconfig --name dev-cluster
-                kubectl config current-context
-                kubectl cluster-info
-                """
-            }
-
-            // ============================
-            // 🚀 DEPLOY TO KIND
-            // ============================
-
-            stage('Deploy to KIND') {
-                sh """
-                kubectl apply -f deployment.yml
-                kubectl apply -f service.yaml
-
-                kubectl get pods -o wide
-                kubectl get svc
                 """
             }
         }
