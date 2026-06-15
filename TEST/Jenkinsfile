@@ -62,7 +62,14 @@ node {
                     """
                 }
             }
-
+            stage('Debug Docker Context') {
+    sh """
+    pwd
+    ls -l
+    ls -l target || true
+    ls -l Dockerfile
+    """
+}
             stage('Docker Build') {
                 sh "docker build -t ${appName}:${imageTag} ."
             }
