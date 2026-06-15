@@ -125,7 +125,7 @@ node {
                 echo "Deploying application..."
 
                 kubectl apply -f deployment.yml
-                kubectl apply -f service.yaml
+                kubectl apply -f Service.yml
 
                 echo "Waiting for rollout..."
                 kubectl rollout status deployment/test-app || true
