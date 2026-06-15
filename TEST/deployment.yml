@@ -14,8 +14,10 @@ spec:
       labels:
         app: test-app
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
       containers:
-      - name: test-app
-        image: 933858446728.dkr.ecr.us-east-1.amazonaws.com/mine/repp:latest
-        ports:
-        - containerPort: 8080
+        - name: test-app
+          image: 933858446728.dkr.ecr.us-east-1.amazonaws.com/mine/repp:latest
+          ports:
+            - containerPort: 8080
