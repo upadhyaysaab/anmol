@@ -1,4 +1,4 @@
-node('linux') {
+node {
 
     def appName = "test-app"
     def imageTag = "latest"
