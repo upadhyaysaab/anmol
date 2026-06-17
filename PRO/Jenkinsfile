@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE = "demo-app"
+        TAG = "${BUILD_NUMBER}"
+        USER = "your-dockerhub-username"
+    }
+
+    stages {
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh "docker build -t $USER/$IMAGE:$TAG ."
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                withDockerRegistry([credentialsId: 'dockerhub-creds']) {
+                    sh "docker push $USER/$IMAGE:$TAG"
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh "kubectl apply -f deployment.yaml"
+                sh "kubectl apply -f service.yaml"
+                sh "kubectl set image deployment/demo-app demo-app=$USER/$IMAGE:$TAG"
+            }
+        }
+    }
+}
