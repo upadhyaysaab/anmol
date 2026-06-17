@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: httpd-multicluster
+  namespace: argocd
+spec:
+  generators:
+  - clusters: {}
+
+  template:
+    metadata:
+      name: '{{name}}-httpd'
+    spec:
+      project: default
+
+      source:
+        repoURL: https://github.com/YOUR_USERNAME/YOUR_REPO.git
+        targetRevision: HEAD
+        path: TEST/APPS
+        directory:
+          recurse: true
+
+      destination:
+        server: '{{server}}'
+        namespace: default
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
