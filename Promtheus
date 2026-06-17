@@ -1,0 +1,199 @@
+Step 1: kube-state-metrics running in EKS
+
+👉 It creates a pod + service
+
+Example:
+
+kubectl get svc -n monitoring
+
+Output:
+
+kube-state-metrics   ClusterIP   10.x.x.x   8080
+
+👉 This service exposes:
+
+http://kube-state-metrics:8080/metrics
+🧩 Step 2: ServiceMonitor (IMPORTANT)
+
+👉 This is the key piece you’re missing
+
+A ServiceMonitor tells Prometheus:
+
+👉 “Hey! go scrape this service”
+
+Example:
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-state-metrics
+spec:
+  selector:
+    matchLabels:
+      app: kube-state-metrics
+  endpoints:
+  - port: http
+    interval: 30s
+
+👉 Translation:
+
+Find service with label app=kube-state-metrics
+
+Hit /metrics every 30 sec
+
+🧩 Step 3: Prometheus Operator
+
+👉 This is running in your cluster (installed via Helm)
+
+It does:
+
+Watches ServiceMonitor objects
+
+Automatically updates Prometheus config
+
+👉 You DON’T manually edit prometheus.yml
+
+🧩 Step 4: Prometheus scrapes
+
+Now Prometheus knows:
+
+👉 “I need to scrape this service”
+
+So it calls:
+
+http://kube-state-metrics:8080/metrics
+
+and stores data.
+
+🔁 Full Flow in One Line
+
+👉 Service → ServiceMonitor → Prometheus Operator → Prometheus → Metrics stored
+
+🔥 Real-Life Analogy (easy)
+
+Think like this:
+
+kube-state-metrics = teacher giving data
+
+Service = classroom address
+
+ServiceMonitor = timetable
+
+Prometheus = student collecting notes
+
+
+
+------------------------------------------------------------
+
+Full Monitoring Flow in EKS (Hinglish)
+Pods run ho rahe hain cluster me
+Ye jo app ya services chal rahi hain, unke internal state aur metrics chahiye monitoring ke liye.
+Example: CPU usage, memory, pod status, deployments etc.
+kube-state-metrics / Metrics Exporter
+Ye ek pod + service create karta hai.
+Ye pod cluster state ka data /metrics endpoint pe expose karta hai.
+
+Example URL:
+
+http://kube-state-metrics:8080/metrics
+Service
+Ye kube-state-metrics pod ko cluster ke andar access karne ke liye address deta hai.
+Service ek stable IP / DNS provide karta hai, chahe pod restart ho jaye.
+ServiceMonitor (Important)
+Ye Prometheus ko batata hai ki kaunsi service ko scrape karna hai aur kitni frequency me.
+
+Example:
+
+matchLabels:
+  app: kube-state-metrics
+interval: 30s
+Matlab: /metrics endpoint ko har 30 second me scrape karo.
+Prometheus Operator
+Ye cluster me run hota hai aur ServiceMonitor objects ko watch karta hai.
+Automatically Prometheus ka config update karta hai.
+Aapko manually prometheus.yml edit nahi karna padta.
+Prometheus
+Operator ke through Prometheus ko pata chal gaya ki kya scrape karna hai.
+Prometheus /metrics call karta hai aur data store kar leta hai.
+Example: Pod CPU usage, memory usage, pod count, restarts etc.
+Alerting (Prometheus Alertmanager)
+Prometheus rules ke through thresholds set karte hain.
+Example: CPU > 80%, Pod down, Memory > 70%
+Agar condition meet hoti hai, Alertmanager notification send karta hai:
+Slack, Email, Teams, SMS, Webhook
+Visualization (Optional)
+Prometheus se data ko Grafana me visualize kar sakte ho.
+Dashboards me graphs, trends, history, alerts etc.
+One-line Full Flow (Hinglish)
+Pods → kube-state-metrics → Service → ServiceMonitor → Prometheus Operator → Prometheus → AlertManager → Metrics/Alerts
+
+💡 Real-life analogy (easy):
+
+Pods = Students working
+kube-state-metrics = Teacher giving test scores
+Service = Classroom address
+ServiceMonitor = Timetable (when to collect data)
+Prometheus Operator = Coordinator telling student where to go
+Prometheus = Student collecting notes
+AlertManager = Parent/Principal gets alerted if something is wrong
+
+
+
+
+-----------------------------------------------------------
+
+1️⃣ Pod/Deployment
+Tumhare kube-state-metrics Deployment/Pod me hota hai label:
+labels:
+  app.kubernetes.io/name: kube-state-metrics
+Ye label define karta hai ki Service kaunse pods ko target karega.
+
+2️⃣ Service
+Tumhare Service me hota hai selector:
+selector:
+  app.kubernetes.io/name: kube-state-metrics
+Selector = Deployment/Pod ke labels se match karna chahiye
+Ye decide karta hai ki service metrics request ko kaunse pods me forward kare
+
+3️⃣ ServiceMonitor (Prometheus Operator ke liye)
+Tumhare ServiceMonitor ka selector:
+selector:
+  matchLabels:
+    app.kubernetes.io/name: kube-state-metrics
+Ye Service ke labels se match karna chahiye, nahi toh Prometheus service ko scrape nahi karega
+
+🔹 Flow me matching
+Pod/Deployment label
+      ↓ matches
+Service selector
+      ↓ matches
+ServiceMonitor selector
+      ↓ tells Prometheus to scrape this service
+
+
+
+Kube-state-metrics + ServiceMonitor + PrometheusRule
+
+Sab alerting aur metrics YAMLs alag hain:
+kube-state-metrics Deployment + Service (automatically Helm se create hota hai)
+ServiceMonitor → manually create, Prometheus ko metrics scrape karne ke liye
+PrometheusRule → manually create, microservice A/B ke thresholds define karne ke liye
+
+
+
+-----------------------------------------------
+
+Pod exposes /metrics endpoint
+        ↓
+Service exposes pod port
+        ↓
+ServiceMonitor points to service port + path (/metrics)
+        ↓
+Prometheus scrapes metrics
+        ↓
+Alert rules evaluated
+        ↓
+Alertmanager sends notification
+
+
+Pod → /metrics → Service → ServiceMonitor → Prometheus → Alert Rule → Alertmanager → Slack/Email

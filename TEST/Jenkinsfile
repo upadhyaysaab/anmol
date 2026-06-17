@@ -1,0 +1,147 @@
+node {
+
+    def appName = "test-app"
+    def imageTag = "latest"
+    def JAVA_HOME = "/usr/lib/jvm/java-21-amazon-corretto"
+    def ECR_REPO = "933858446728.dkr.ecr.us-east-1.amazonaws.com/mine/repp"
+
+    try {
+
+        stage('Setup Environment') {
+            sh """
+            export JAVA_HOME=${JAVA_HOME}
+            export PATH=$JAVA_HOME/bin:$PATH
+
+            java -version
+            javac -version
+            mvn -version
+            """
+        }
+
+        stage('Checkout') {
+            checkout scm
+        }
+
+        dir('TEST') {
+
+            stage('Build') {
+                sh """
+                export JAVA_HOME=${JAVA_HOME}
+                export PATH=$JAVA_HOME/bin:$PATH
+                mvn clean package
+                """
+            }
+
+            stage('Unit Test') {
+                sh """
+                export JAVA_HOME=${JAVA_HOME}
+                export PATH=$JAVA_HOME/bin:$PATH
+                mvn test
+                """
+            }
+
+            stage('JaCoCo Report') {
+                sh """
+                export JAVA_HOME=${JAVA_HOME}
+                export PATH=$JAVA_HOME/bin:$PATH
+                mvn jacoco:report
+                """
+            }
+
+            stage('SonarQube Analysis') {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh """
+                    export JAVA_HOME=${JAVA_HOME}
+                    export PATH=$JAVA_HOME/bin:$PATH
+
+                    mvn sonar:sonar \
+                    -Dsonar.host.url=http://3.94.203.126:9000 \
+                    -Dsonar.login=admin \
+                    -Dsonar.password=Avengers6@
+                    """
+                }
+            }
+
+            stage('Docker Build') {
+                sh "docker build -t ${appName}:${imageTag} ."
+            }
+
+            stage('Run Container') {
+                sh """
+                docker rm -f ${appName} || true
+                docker run -d -p 8081:8080 --name ${appName} ${appName}:${imageTag}
+                """
+
+                timeout(time: 30, unit: 'SECONDS') {
+                    waitUntil {
+                        def status = sh(
+                            script: "curl -s http://localhost:8081/hello",
+                            returnStatus: true
+                        )
+                        return status == 0
+                    }
+                }
+            }
+
+            stage('Integration Test - Newman') {
+                sh """
+                newman run postman_collection.json \
+                --env-var baseUrl=http://localhost:8081 \
+                --reporters cli,html \
+                --reporter-html-export newman-report.html
+                """
+            }
+
+            stage('Trivy Scan') {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh "trivy image --exit-code 1 --severity HIGH,CRITICAL ${appName}:${imageTag}"
+                }
+            }
+
+            stage('Push to ECR') {
+                sh """
+                aws ecr get-login-password --region us-east-1 \
+                | docker login --username AWS --password-stdin ${ECR_REPO}
+
+                docker tag ${appName}:${imageTag} ${ECR_REPO}:${imageTag}
+                docker push ${ECR_REPO}:${imageTag}
+                """
+            }
+
+            // ============================
+            // 🚀 KIND DEPLOY STAGE (FIXED)
+            // ============================
+
+            stage('Deploy to KIND') {
+                sh """
+                echo "Setting up KIND kubeconfig..."
+
+                kind export kubeconfig --name dev-cluster
+
+                echo "Verifying cluster..."
+                kubectl cluster-info
+                kubectl get nodes
+
+                echo "Deploying application..."
+
+                kubectl apply -f deployment.yml
+                kubectl apply -f Service.yml
+
+                echo "Waiting for rollout..."
+                kubectl rollout status deployment/test-app || true
+
+                echo "Pods:"
+                kubectl get pods -o wide
+
+                echo "Services:"
+                kubectl get svc
+                """
+            }
+        }
+
+    } finally {
+
+        junit 'TEST/target/surefire-reports/*.xml'
+        archiveArtifacts artifacts: 'TEST/newman-report.html', fingerprint: true
+    }
+}

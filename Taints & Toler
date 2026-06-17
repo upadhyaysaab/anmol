@@ -1,0 +1,63 @@
+Step 1 — Put Taint on Node
+
+Node protects itself.
+
+Example:
+
+kubectl taint nodes node-c env=prod:NoSchedule
+
+Meaning:
+
+“No pod allowed here unless tolerated.”
+
+Step 2 — Add Toleration in Specific Pod
+
+Only pods you WANT on that node get toleration.
+
+tolerations:
+- key: "env"
+  operator: "Equal"
+  value: "prod"
+  effect: "NoSchedule"
+
+Now this pod is allowed ✅
+
+Other pods without toleration:
+
+blocked ❌
+But Important ⚡
+
+Toleration alone does NOT guarantee pod goes there.
+
+It only gives permission.
+
+If you want pod specifically on that node/group:
+
+Use ALSO:
+
+nodeSelector:
+  env: prod
+Real Production Pattern 🔥
+Node
+kubectl label node node-c env=prod
+
+kubectl taint node node-c env=prod:NoSchedule
+Pod
+spec:
+  nodeSelector:
+    env: prod
+
+  tolerations:
+  - key: "env"
+    operator: "Equal"
+    value: "prod"
+    effect: "NoSchedule"
+Simple Understanding 😄
+Component	Job
+Taint	Node says “stay away”
+Toleration	Pod says “I have permission”
+nodeSelector	Pod says “I want this node”
+
+Together = strong isolation 🔥
+
+Very common in Kubernetes and Amazon Elastic Kubernetes Service production clusters.

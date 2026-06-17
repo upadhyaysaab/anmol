@@ -1,0 +1,94 @@
+# FOR MEMORY ALERTS ##
+
+#!/bin/bash
+
+# Get free memory in MB
+FREE_MEM=$(free -mt | grep "Total:" | awk '{print $4}')
+TH=10  # Threshold in MB
+
+if [[ "$FREE_MEM" -lt "$TH" ]]; then
+    echo "⚠️ Kindly adjust your RAM. Free memory is ${FREE_MEM} MB"
+else
+    echo "✅ Everything is fine. Free memory is ${FREE_MEM} MB"
+fi
+
+# FOR RAM
+
+$ df -k
+Filesystem      1K-blocks     Used  Available Use% Mounted on
+$ overlay        2077555056 56250372 1915696700   3% /
+$ tmpfs               65536        0      65536   0% /dev
+$ tmpfs            65903248        0   65903248   0% /sys/fs/cgroup
+$ shm                 65536        0      65536   0% /dev/shm
+$ /dev/nvme1n1p3 2077555056 56250372 1915696700   3% /usr/sbin/docker-init
+$ tmpfs              524288        0     524288   0% /run
+$ tmpfs             1048576        0    1048576   0% /tmp
+$ tmpfs            16777216      992   16776224   1% /home/cg/root
+$ tmpfs            65903248        0   65903248   0% /proc/acpi
+$ tmpfs            65903248        0   65903248   0% /proc/scsi
+$ tmpfs            65903248        0   65903248   0% /sys/firmware
+$ tmpfs            65903248        0   65903248   0% /sys/devices/virtual/powercap
+$ 
+$ df -H | grep "nvme1n1p3" | awk '{print $5}' | tr -d %
+3
+
+
+#!/bin/bash
+
+# Get disk usage % for root partition
+FREE_DISK=$(df -H | grep "/$" | awk '{print $5}' | tr -d '%')
+TH=12  # Threshold in percent
+
+if [[ "$FREE_DISK" -lt "$TH" ]]; then
+    echo "✅ Disk usage is low, everything is ok"
+else
+    echo "⚠️ Disk usage is high, take action!"
+fi
+
+### FOR ALERT ###
+
+#!/bin/bash
+
+# Get disk usage % for root partition
+FREE_DISK=$(df -H | grep "/$" | awk '{print $5}' | tr -d '%')
+TH=12  # Threshold in percent
+
+TO="asn@gmail.com"
+if [[ "$FREE_DISK" -lt "$TH" ]]; then
+    echo "✅ Disk usage is low, everything is ok" 
+else
+    echo "⚠️ Disk usage is high, take action!" | mail -s "ALERT!" $TO
+fi
+
+### CRONTAB for automation (crontab -e)
+
+5 * * * * /tmp/abc.sh
+
+
+
+
+### WITHCLOUD WATCH AND SNS ##
+
+#!/bin/bash
+
+PARTITION="/"
+THRESHOLD=12
+SNS_TOPIC_ARN="arn:aws:sns:us-east-1:123456789012:MyAlerts"
+
+# Get disk usage %
+USAGE=$(df -k | grep "$PARTITION" | awk '{print $5}' | tr -d '%')
+
+# Push metric to CloudWatch
+aws cloudwatch put-metric-data \
+    --namespace "DevOps/Metrics" \
+    --metric-name "DiskUsage" \
+    --value "$USAGE" \
+    --unit Percent &> /dev/null
+
+# Check threshold and send SNS alert if exceeded
+if [[ "$USAGE" -ge "$THRESHOLD" ]]; then
+    aws sns publish \
+        --topic-arn "$SNS_TOPIC_ARN" \
+        --subject "Disk Alert on $(hostname)" \
+        --message "Disk usage on $PARTITION is ${USAGE}% (threshold $THRESHOLD%)" &> /dev/null
+fi
