@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: httpd-multicluster
+  name: httpd-nginx-multicluster
   namespace: argocd
 spec:
   generators:
@@ -9,12 +9,12 @@ spec:
 
   template:
     metadata:
-      name: '{{name}}-httpd'
+      name: '{{name}}-httpd-nginx'
     spec:
       project: default
 
       source:
-        repoURL: https://github.com/YOUR_USERNAME/YOUR_REPO.git
+        repoURL: https://github.com/upadhyaysaab/anmol.git
         targetRevision: HEAD
         path: TEST/APPS
         directory:
