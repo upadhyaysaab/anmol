@@ -1,0 +1,25 @@
+node {
+
+    stage('Checkout') {
+        checkout scm
+    }
+
+    stage('Build') {
+        sh 'mvn clean package'
+    }
+
+    stage('Docker Build') {
+        sh 'docker build -t springboot-hello .'
+    }
+
+    stage('Run') {
+        sh '''
+        docker rm -f springboot-hello || true
+        docker run -d \
+        --name springboot-hello \
+        -p 8081:8080 \
+        springboot-hello
+        '''
+    }
+
+}
